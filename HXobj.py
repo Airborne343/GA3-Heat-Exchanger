@@ -17,7 +17,7 @@ class HeatExchanger:
         self.baffle_width = self.length/self.baffle_count
         self.area_shell = (self.D_shell/self.pitch)*(self.baffle_width)*(self.pitch - self.tube_OD)
         self.area_pipe = self.tube_count * 0.25 * self.tube_ID**2 * np.pi
-        self.sigma = self.pipearea / (0.25* self.D_shell**2 * np.pi)
+        self.sigma = self.area_pipe / (0.25* self.D_shell**2 * np.pi)
 
     #Fluid Constants
         self.heat_cap = 4179 #J/kg K
