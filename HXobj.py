@@ -8,12 +8,15 @@ class HeatExchanger:
         self.type= type
 
     # Optional attributes with default values
-        self.tube_OD = 8/1000  # in meters
         self.tube_ID = 6/1000 # in meters
+        self.tube_OD = 8/1000  # in meters
+        self.pitch = self.tube_ID + self.tube_OD # in meters
         self.length = 0.35 # in meters
         self.D_shell = 0.064 # in meters
-        self.D_nozzle = 0.02 # in meters
-        self.pipearea = self.tube_count * 0.25 * self.tube_ID**2 * np.pi
+        self.area_nozzle = np.pi * (0.01)**2 # in meters
+        self.area_shell = (self.D_shell/self.pitch)*(self.baffle_width)*(self.pitch - self.tube_OD)
+        self.area_pipe = self.tube_count * 0.25 * self.tube_ID**2 * np.pi
+        self.baffle_width = self.length/self.baffle_count
         self.sigma = self.pipearea / (0.25* self.D_shell**2 * np.pi)
 
     #Fluid Constants
