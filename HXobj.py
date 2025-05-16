@@ -12,8 +12,17 @@ class HeatExchanger:
         self.tube_ID = 6/1000 # in meters
         self.length = 0.35 # in meters
         self.D_shell = 0.064 # in meters
+        self.D_nozzle = 0.02 # in meters
         self.pipearea = self.tube_count * 0.25 * self.tube_ID**2 * np.pi
         self.sigma = self.pipearea / (0.25* self.D_shell**2 * np.pi)
+
+    #Fluid Constants
+        self.heat_cap = 4179 #J/kg K
+        self.density = 990.1 #kg/m^3
+        self.water_heat_conductivity = 0.632 #W/mK
+        self.tube_heat_conductivity = 386 #W/mK
+        self.dynamic_viscosity = 6.51 * (10**(-4)) #kg/ms
+        self.Prandtl_no = 4.31 #non-dim constant
 
     def summary(self):
         print(f"Heat Exchanger Summary:")
