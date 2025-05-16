@@ -2,21 +2,23 @@ import numpy as np
 import math
 import matplotlib as plt
 from scipy.optimize import differential_evolution
+import time
 
 #initialise variables
-Thot_in = 60
-Tcold_in = 20
-m_hot = 0.47
-m_cold = 0.5
 cp_w = 4179
 rho_w = 990.1
 k_w = 0.632
 k_tube = 386
-mu_w = 6.51*(10^-4)
-Pr = 4.31
-H = 3927
 L = 0.35
 d_inner = 0.006
+Pr = 4.31
+mu_w = 6.51*(10^-4)
+
+Thot_in = 60
+Tcold_in = 20
+m_hot = 0.47
+m_cold = 0.5
+H = 3927
 N_tubes = 13
 A_ht = N_tubes * np.pi * L * d_inner
 F = 1 
@@ -78,7 +80,7 @@ for i in range(n_iter):
     LMTD = (Delta_T1 - Delta_T2)/np.log(Delta_T1/Delta_T2)
     Q_LMTD = H * A_ht * F * LMTD
     Thot_out_LMTD = Thot_in - Q_LMTD/C_hot
-    
+
     if abs(Thot_out_LMTD - Thot_out_init) < convergence_thresh:
         break
 
