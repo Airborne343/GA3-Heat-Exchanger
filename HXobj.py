@@ -1,16 +1,19 @@
-from dataclasses import dataclass, field
+import numpy as np
 
 class HeatExchanger:
-    # Required attributes
-    tube_count: int
-    baffle_count: int
-    type: str  # e.g., 'shell-and-tube', 'plate', etc.
+    def __init__ (self, tube_count: int, baffle_count: int, type: str):
+        # Required attributes
+        self.tube_count= tube_count
+        self.baffle_count= baffle_count
+        self.type= type
 
     # Optional attributes with default values
-    tube_OD: float = field(default=8/1000)  # in meters
-    tube_ID: float = field(default=6/1000)  # in meters
-    length: float = field(default=0.35) # in meters
-    D_shell: float = field(default=0.064) # in meters
+        self.tube_OD = 8/1000  # in meters
+        self.tube_ID = 6/1000 # in meters
+        self.length = 0.35 # in meters
+        self.D_shell = 0.064 # in meters
+        self.pipearea = 0.25 * self.tube_ID**2 * np.pi
+        self.sigma = self.pipearea / (0.25* self.D_shell**2 * np.pi)
 
     def summary(self):
         print(f"Heat Exchanger Summary:")
@@ -21,7 +24,3 @@ class HeatExchanger:
         print(f"  Tube inner diameter: {self.ID} m")
         print(f"  Tube length: {self.length} m")
         print(f"  Shell diameter: {self.D_shell} m")
-
-     def __post_init__(self):
-        # Compute derived attribute
-        
