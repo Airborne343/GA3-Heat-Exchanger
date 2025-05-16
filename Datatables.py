@@ -69,5 +69,3 @@ def Ke(sigma, Re):
 
     # Return the combined cubic‐in‐sigma polynomial
     return d3*σ**3 + d2*σ**2 + d1*σ + d0
-
-print(Coldchic(qdot= 0.658/1000))
