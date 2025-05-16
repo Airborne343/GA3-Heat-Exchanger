@@ -12,7 +12,7 @@ class HeatExchanger:
         self.tube_ID = 6/1000 # in meters
         self.length = 0.35 # in meters
         self.D_shell = 0.064 # in meters
-        self.pipearea = 0.25 * self.tube_ID**2 * np.pi
+        self.pipearea = self.tube_count * 0.25 * self.tube_ID**2 * np.pi
         self.sigma = self.pipearea / (0.25* self.D_shell**2 * np.pi)
 
     def summary(self):

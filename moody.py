@@ -2,11 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # COLD SIDE data
-cold_flow = np.array([0.6580, 0.6290, 0.5830, 0.5380, 0.4670, 0.3920, 0.3210, 0.2790, 0.2210, 0]) * 1000
+cold_flow = np.array([0.6580, 0.6290, 0.5830, 0.5380, 0.4670, 0.3920, 0.3210, 0.2790, 0.2210, 0]) / 1000
 cold_pressure = np.array([0.1584, 0.1958, 0.2493, 0.3127, 0.3723, 0.4436, 0.4950, 0.5318, 0.5739, 0.7077]) * 100000
 
 # HOT SIDE data
-hot_flow = np.array([0.4360, 0.3870, 0.3520, 0.3110, 0.2600, 0.2290, 0.1670, 0.1180, 0.0690, 0.0010]) * 1000
+hot_flow = np.array([0.4360, 0.3870, 0.3520, 0.3110, 0.2600, 0.2290, 0.1670, 0.1180, 0.0690, 0.0010]) / 1000
 hot_pressure = np.array([0.0932, 0.1688, 0.2209, 0.2871, 0.3554, 0.4041, 0.4853, 0.5260, 0.5665, 0.6239]) * 100000
 
 # Fit 4th-order polynomials
@@ -30,7 +30,7 @@ x_hot = np.linspace(0, max(hot_pressure), 200)
 
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
-plt.plot(cold_pressure, cold_flow,  'bo', label='Cold data')
+plt.plot(cold_pressure, cold_flow, 'bo', label='Cold data')
 plt.plot(x_cold, cold_poly(x_cold), 'b-', label='Cold fit')
 plt.title('Cold Side Fit')
 plt.xlabel('Flowrate (litres/s)')
