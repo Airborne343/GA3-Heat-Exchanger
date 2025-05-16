@@ -10,8 +10,8 @@ hot_flow = np.array([0.4360, 0.3870, 0.3520, 0.3110, 0.2600, 0.2290, 0.1670, 0.1
 hot_pressure = np.array([0.0932, 0.1688, 0.2209, 0.2871, 0.3554, 0.4041, 0.4853, 0.5260, 0.5665, 0.6239]) * 100000
 
 # Fit 4th-order polynomials
-cold_poly_coeffs = np.polyfit(cold_pressure, cold_flow, 4)
-hot_poly_coeffs = np.polyfit(hot_pressure, hot_flow, 4)
+cold_poly_coeffs = np.polyfit(cold_flow, cold_pressure, 4)
+hot_poly_coeffs = np.polyfit(hot_flow, hot_pressure, 4)
 
 # Create polynomial functions
 cold_poly = np.poly1d(cold_poly_coeffs)
@@ -25,12 +25,12 @@ print("\nHot side 4th-order polynomial coefficients:")
 print(hot_poly_coeffs)
 
 # Optional: plot fits
-x_cold = np.linspace(0, max(cold_pressure), 200)
-x_hot = np.linspace(0, max(hot_pressure), 200)
+x_cold = np.linspace(0, max(cold_flow), 200)
+x_hot = np.linspace(0, max(hot_flow), 200)
 
 plt.figure(figsize=(10, 5))
 plt.subplot(1, 2, 1)
-plt.plot(cold_pressure, cold_flow, 'bo', label='Cold data')
+plt.plot(cold_flow, cold_pressure, 'bo', label='Cold data')
 plt.plot(x_cold, cold_poly(x_cold), 'b-', label='Cold fit')
 plt.title('Cold Side Fit')
 plt.xlabel('Flowrate (litres/s)')
@@ -38,7 +38,7 @@ plt.ylabel('Pressure rise (bar)')
 plt.legend()
 
 plt.subplot(1, 2, 2)
-plt.plot(hot_pressure, hot_flow, 'ro', label='Hot data')
+plt.plot(hot_flow, hot_pressure, 'ro', label='Hot data')
 plt.plot(x_hot, hot_poly(x_hot), 'r-', label='Hot fit')
 plt.title('Hot Side Fit')
 plt.xlabel('Flowrate (litres/s)')
