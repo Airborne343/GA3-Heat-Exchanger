@@ -2,31 +2,28 @@ import numpy as np
 from scipy.optimize import fsolve
 
 #Tables for compressor chics
-def Coldchic(p = None, qdot = None): #cm3/s to Pa
+def Coldchic(qdot = None, p = None): #cm3/s to Pa
     if p == None: 
-        coeffs = [-2.03241506e+17,  2.18666233e+14, -1.17200431e+11, -4.34105885e+07,
-  7.07758580e+04]
-        return coeffs
+        poly = np.poly1d([-2.03241506e+17,  2.18666233e+14, -1.17200431e+11, -4.34105885e+07,
+  7.07758580e+04])
+        return poly(qdot)
     
     elif qdot == None:
-        coeffs = [-1.12242099e-23, 1.58646220e-18, -1.69351833e-13, -2.28742118e-09,
-  7.29640030e-04]
-        return coeffs
+        poly = np.poly1d([-1.12242099e-23, 1.58646220e-18, -1.69351833e-13, -2.28742118e-09,
+  7.29640030e-04])
+        return poly(p)
     else:
         raise("Invalid input, only input one of pressure or mass flow")
           
 
-def Hotchic(p = None, qdot = None): #cm3/s to Pa
+def Hotchic(qdot = None, p = None): #cm3/s to Pa
     if p == None: 
-        coeffs = [ 1.30073533e+1, -1.00398975e+15,  9.91494147e+10, -8.16106902e+07,
-  6.23799629e+04]
-        return coeffs
+        poly = np.poly1d([1.36023711e+14, -2.12561947e+11, -5.47282451e+07,  6.21083811e+04])
+        return poly(qdot)
     
     elif qdot == None:
-        coeffs = [-8.70199042e-24, -4.64584399e-19,  6.03677597e-14, -7.97101169e-09,
-  5.06006301e-04]
-        return coeffs
-    
+        poly = np.poly1d([-1.71799882e-18,  1.21807382e-13, -9.14198807e-09,  5.12949839e-04])
+        return poly(p)
     else:
         raise("Invalid input, only input one of pressure or mass flow")
 
@@ -69,4 +66,4 @@ def Ke(sigma, Re):
     # Return the combined cubic‐in‐sigma polynomial
     return d3*σ**3 + d2*σ**2 + d1*σ + d0
 
-print(Coldchic(p = 10000))
+
