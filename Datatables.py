@@ -2,7 +2,7 @@ import numpy as np
 from scipy.optimize import fsolve
 
 #Tables for compressor chics
-def Coldchic(p = None, qdot = None): #cm3/s to Pa
+def Coldchic(qdot = None, p = None): #cm3/s to Pa
     if p == None: 
         poly = np.poly1d([-2.03241506e+17,  2.18666233e+14, -1.17200431e+11, -4.34105885e+07,
   7.07758580e+04])
@@ -16,7 +16,7 @@ def Coldchic(p = None, qdot = None): #cm3/s to Pa
         raise("Invalid input, only input one of pressure or mass flow")
           
 
-def Hotchic(p = None, qdot = None): #cm3/s to Pa
+def Hotchic(qdot = None, p = None): #cm3/s to Pa
     if p == None: 
         poly = np.poly1d([1.36023711e+14, -2.12561947e+11, -5.47282451e+07,  6.21083811e+04])
         return poly(qdot)
@@ -66,4 +66,4 @@ def Ke(sigma, Re):
     # Return the combined cubic‐in‐sigma polynomial
     return d3*σ**3 + d2*σ**2 + d1*σ + d0
 
-print(Coldchic(p = 10000))
+
