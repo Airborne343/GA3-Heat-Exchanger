@@ -22,35 +22,10 @@ def compressor_pressure(mcold):
     qcold = mcold/hex.density
     coeffs = Coldchic(qdot=None)
     pcomp = np.polyval(coeffs, qcold)
-    return pcomp
+    return qcold, pcomp
 
-# Iterative Optimization Parameters
-mcold = 0.5
-convergence_limit = 1e-3
-step_factor = 0.01
-max_iterations = 100
-iteration = 0
+mcold_guess = 0.5
+qcold_guess, comp_ploss = compressor_pressure(mcold_guess)
+ploss_total = calculate_pressure_loss(mcold_guess)
 
-while iteration < max_iterations:
-    ploss = calculate_pressure_loss(mcold)
-    pcomp = compressor_pressure(mcold)
-    difference = ploss - pcomp
-    
-    print(f"Iteration {iteration+1}: Mass Flow Rate = {mcold:.4f} kg/s, "
-          f"Pressure Loss = {ploss:.2f} Pa, Compressor Pressure = {pcomp:.2f} Pa, "
-          f"Difference = {difference:.4f}")
-    
-    if abs(difference) <= convergence_limit:
-        print("\nConvergence achieved!")
-        break
-
-    mcold -= step_factor * difference
-    
-    iteration += 1
-
-if iteration >= max_iterations:
-    print("\nMaximum iterations reached without convergence.")
-
-print(f"\nOptimal Mass Flow Rate: {mcold:.4f} kg/s")
-print(f"Final Pressure Loss: {ploss:.2f} Pa")
-print(f"Final Compressor Pressure: {pcomp:.2f} Pa")
+print(qcold_guess, comp_ploss, ploss_total)
