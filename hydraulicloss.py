@@ -40,7 +40,6 @@ def P_drop_cold(mcold, Hx):
 
     return [ploss_cold_tot - Coldchic(qdot = Volflow), ploss_cold_tot, Coldchic(qdot = Volflow)]
 
-
 def iteration(pressure, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
     massflow = initialmass
 
