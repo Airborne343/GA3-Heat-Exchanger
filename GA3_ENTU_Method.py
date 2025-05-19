@@ -21,23 +21,24 @@ A_ht = N_tubes * np.pi * L * d_inner
 F = 1 
 
 #ENTU Method
-def effective_NTU(H, N_tubes, m_hot, Thot_in, m_cold, Tcold_in, cp_w, N_shell):
-    C_hot = cp_w * m_hot
-    C_cold = cp_w * m_cold
+def effective_NTU(HX, H, m_hot, m_cold, Thot_in = 60 ,Tcold_in = 20):
+    C_hot = HX.heat_cap * m_hot
+    C_cold = HX.heat_cap * m_cold
     C_min = min(C_hot, C_cold)
     C_max = max(C_hot, C_cold)
     C_r = C_min/C_max
+
     
-    A_ht = N_tubes * np.pi * 0.35 * 0.006
+    A_ht = HX.tube_count * np.pi * HX.length * HX.tube_ID
     NTU = (H*A_ht)/C_min
 
     eff_1 = 2/(1 + C_r + np.sqrt(1 + C_r**2)*((1 + np.exp(-NTU * np.sqrt(1 + C_r**2)))/(1 - np.exp(-NTU * np.sqrt(1 + C_r**2)))))
 
-    if N_shell == 1:
+    if HX.N_shell == 1:
         eff = eff_1
     
     else:
-        eff = (((1-eff_1*C_r)/(1-eff_1))**N_shell - 1)/(((1-eff_1*C_r)/(1-eff_1))**N_shell - C_r)
+        eff = (((1-eff_1*C_r)/(1-eff_1))*HX.N_shell - 1)/(((1-eff_1*C_r)/(1-eff_1))**HX.N_shell - C_r)
 
     q_max = C_min * (Thot_in - Tcold_in)
     q_abs = eff * q_max 

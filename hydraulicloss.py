@@ -3,7 +3,7 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-Hx = HeatExchanger(tube_count = 6, baffle_count = 9, type = "triangle")
+Hx = HeatExchanger(tube_count = 1, baffle_count = 9, type = "triangle")
 
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
@@ -16,7 +16,7 @@ def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
 
     #Working out three sources of pressure drop, tube friction, end losses for tubes and inlet nozzle drops
     P_pipe = q_pipe * Hx.length / Hx.tube_ID * Friction(Re_pipe)
-    P_ends = q_pipe * (Kc(Hx.sigma, Re_pipe) + Ke(Hx.sigma, Re_pipe))
+    P_ends = q_pipe * (Kc(Hx.sigma, Re_pipe) + Ke(Hx.sigma, Re_pipe)) 
     P_nozzle = 0.5 * Hx.density * (Volflow/Hx.area_nozzle)**2 * 2
 
     #Summing pressure losses and combining
@@ -40,15 +40,15 @@ def P_drop_cold(mcold, Hx):
 
     return [ploss_cold_tot - Coldchic(qdot = Volflow), ploss_cold_tot, Coldchic(qdot = Volflow)]
 
-def iteration(pressure, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
+def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
     massflow = initialmass
 
     for i in range(maxiter):
         #Working out 
-        p = pressure(massflow, Hx)[0]
-        dp_dq = (pressure(massflow * 1.05, Hx)[0] - pressure(massflow * 0.95, Hx)[0]) / (2 * 0.05 * massflow)
+        p = pressurefunction(massflow, Hx)[0]
+        dp_dq = (pressurefunction(massflow * 1.05, Hx)[0] - pressurefunction(massflow * 0.95, Hx)[0]) / (2 * 0.05 * massflow)
 
-        #Newton raphson method to calculate pressure drop
+        #Newton raphson method to calculate pressurefunction drop
         massflow_new = massflow - p / dp_dq
         
         print(massflow)
@@ -59,5 +59,5 @@ def iteration(pressure, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
 
     raise("Maximum iterations reached without convergence")
 
-
+print(iteration(P_drop_cold, Hx))
 
