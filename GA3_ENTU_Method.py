@@ -1,27 +1,39 @@
 import numpy as np
 import math
+from HXobj import HeatExchanger
+
+def heat_transfer_coefficient(mhot, mcold, Hx):
+    
+    #inner heat convection coefficient
+    m_tube = mhot/Hx.tube_count
+    V_tube = m_tube/(Hx.density * Hx.area_tube)
+    Re_tube = (Hx.density * V_tube * Hx.tube_ID)/Hx.dynamic_viscosity
+    Nu_inner = 0.023 * (Re_tube ** 0.8) * (Hx.Prandtl_no ** 0.3)
+    conv_coeff_inner = (Nu_inner * Hx.water_heat_conductivity)/Hx.tube_ID
+
+    #outer heat convection coefficient
+    V_shell = mcold/(Hx.density * Hx.area_shell)
+    Re_shell = (Hx.density * V_shell * Hx.charc_D_shell)/Hx.dynamic_viscosity
+    c = 0.15 #constant
+    Nu_outer = c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)
+    conv_coeff_outer = (Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD
+
+    #heat conduction through walls
+    conv_walls = (Hx.inner_surface_area * np.log(Hx.tube_OD/Hx.tube_ID))/(2*np.pi*Hx.tube_heat_conductivity *Hx.length)
+
+    H = 1/(conv_walls + (1/conv_coeff_inner) + (1/conv_coeff_outer)*(Hx.inner_surface_area/Hx.outer_surface_area))
+    return H
 
 #initialise variables
-cp_w = 4179
-rho_w = 990.1
-k_w = 0.632
-k_tube = 386
-L = 0.35
-d_inner = 0.006
-Pr = 4.31
-mu_w = 6.51*(10^-4)
-
-Thot_in = 60
-Tcold_in = 20
+Hx = HeatExchanger(tube_count = 13, baffle_count = 9, type = "triangle")
 m_hot = 0.47
 m_cold = 0.5
-H = 3927
-N_tubes = 13
-A_ht = N_tubes * np.pi * L * d_inner
+A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID
 F = 1 
+H = heat_transfer_coefficient(m_hot, m_cold, Hx)
 
 #ENTU Method
-def effective_NTU(HX, H, m_hot, m_cold, Thot_in = 60 ,Tcold_in = 20):
+def effective_NTU(HX, H, m_hot, m_cold, Thot_in, Tcold_in):
     C_hot = HX.heat_cap * m_hot
     C_cold = HX.heat_cap * m_cold
     C_min = min(C_hot, C_cold)
@@ -48,7 +60,7 @@ def effective_NTU(HX, H, m_hot, m_cold, Thot_in = 60 ,Tcold_in = 20):
 
     return [NTU, eff, Thot_out, Tcold_out, q_abs]
 
-result = effective_NTU(H, N_tubes, m_hot, Thot_in, m_cold, Tcold_in, cp_w, 1)
+result = effective_NTU(Hx, H, m_hot, m_cold, Hx.temp_hot, Hx.temp_cold)
 
 print(f"ENTU NTU: {result[0]:.3f}")
 print(f"ENTU Effectiveness: {result[1]:.3f}")

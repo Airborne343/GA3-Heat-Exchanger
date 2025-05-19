@@ -15,10 +15,16 @@ class HeatExchanger:
         self.length = 0.35 # in meters
         self.D_shell = 0.064 # in meters
         self.baffle_width = self.length/(self.baffle_count + 1)
+
         self.area_nozzle = np.pi * (0.01)**2 # in meters
         self.area_shell = (self.D_shell/self.pitch)*(self.baffle_width)*(self.pitch - self.tube_OD)
-        self.area_tubes = self.tube_count * 0.25 * self.tube_ID**2 * np.pi
+        self.area_tube = 0.25 * self.tube_ID**2 * np.pi
+        self.area_tubes = self.tube_count * self.area_tube
         self.area_pipe = (0.25* self.D_shell**2 * np.pi)
+        self.inner_surface_area = np.pi * self.tube_ID * self.length
+        self.outer_surface_area = np.pi * self.tube_OD * self.length
+        
+        self.charc_D_shell = self.D_shell * (self.area_shell/self.area_pipe)
         self.sigma = self.area_tubes / self.area_pipe
 
         if self.type.lower() == "triangle":
@@ -35,6 +41,10 @@ class HeatExchanger:
         self.tube_heat_conductivity = 386 #W/mK
         self.dynamic_viscosity = 6.51 * (10**(-4)) #kg/ms
         self.Prandtl_no = 4.31 #non-dim constant
+
+    #Temperatures
+        self.temp_cold = 20 #degree Celsius
+        self.temp_hot = 60 #degree Celsius
 
     def summary(self):
         print(f"Heat Exchanger Summary:")
