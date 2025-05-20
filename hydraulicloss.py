@@ -3,20 +3,20 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-Hx = HeatExchanger(tube_count = 1, baffle_count = 9, type = "triangle")
+#Hx = HeatExchanger(tube_count = 1, baffle_count = 9, type = "triangle", passes = 2)
 
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
 
     #Working out velocity, dynamic pressure and reynolds number inside tube
     Volflow = mhot/Hx.density
-    V_pipe = Volflow/Hx.area_tubes
+    V_pipe = Volflow/(Hx.area_tubes/Hx.passes)
     q_pipe = 1/2 * Hx.density * V_pipe ** 2
     Re_pipe = Hx.density * V_pipe * Hx.tube_ID / Hx.dynamic_viscosity
 
     #Working out three sources of pressure drop, tube friction, end losses for tubes and inlet nozzle drops
     P_pipe = q_pipe * Hx.length / Hx.tube_ID * Friction(Re_pipe)
-    P_ends = q_pipe * (Kc(Hx.sigma, Re_pipe) + Ke(Hx.sigma, Re_pipe)) 
+    P_ends = q_pipe * (Kc(Hx.sigma, Re_pipe) + Ke(Hx.sigma, Re_pipe)) * Hx.passes
     P_nozzle = 0.5 * Hx.density * (Volflow/Hx.area_nozzle)**2 * 2
 
     #Summing pressure losses and combining
