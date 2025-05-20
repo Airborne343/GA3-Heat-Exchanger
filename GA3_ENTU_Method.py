@@ -29,7 +29,6 @@ Hx = HeatExchanger(tube_count = 13, baffle_count = 9, type = "triangle")
 m_hot = 0.47
 m_cold = 0.5
 A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID
-F = 1 
 H = heat_transfer_coefficient(m_hot, m_cold, Hx)
 
 #ENTU Method
