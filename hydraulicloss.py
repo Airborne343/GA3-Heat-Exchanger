@@ -51,13 +51,10 @@ def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 1
         #Newton raphson method to calculate pressurefunction drop
         massflow_new = massflow - p / dp_dq
         
-        print(massflow)
         if abs(massflow - massflow_new) < massflow * tol:
             return massflow
 
         massflow = massflow_new
 
     raise("Maximum iterations reached without convergence")
-
-print(iteration(P_drop_cold, Hx))
 

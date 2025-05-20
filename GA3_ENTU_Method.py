@@ -32,7 +32,7 @@ A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID
 H = heat_transfer_coefficient(m_hot, m_cold, Hx)
 
 #ENTU Method
-def effective_NTU(HX, H, m_hot, m_cold, Thot_in, Tcold_in):
+def effective_NTU(HX, H, m_hot, m_cold, Thot_in = 60, Tcold_in = 20):
     C_hot = HX.heat_cap * m_hot
     C_cold = HX.heat_cap * m_cold
     C_min = min(C_hot, C_cold)
