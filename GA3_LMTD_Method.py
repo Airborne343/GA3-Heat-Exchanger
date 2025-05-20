@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from HXobj import HeatExchanger
+from F_factor_test import find_F
 
 def heat_transfer_coefficient(mhot, mcold, Hx):
     
@@ -25,12 +26,10 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     return H
 
 #initialise variables
-Hx = HeatExchanger(tube_count = 13, baffle_count = 9, type = "triangle")
+Hx = HeatExchanger(tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
 m_hot = 0.47
 m_cold = 0.5
 A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID
-N_passes = 1
-F = 1 
 H = heat_transfer_coefficient(m_hot, m_cold, Hx)
 
 #LMTD Method
@@ -46,13 +45,10 @@ for i in range(n_iter):
     Q_val = C_hot * (Hx.temp_hot - Thot_out_init)
     Tcold_out = Hx.temp_cold + Q_val/C_cold
 
-    #temperature effectiveness
-    P = (Tcold_out - Hx.temp_cold)/(Hx.temp_hot - Hx.temp_cold)
-
-    #heat capacity ratio
-    R = (Hx.temp_hot - Thot_out_init)/(Tcold_out - Hx.temp_cold)
-
-    #continue from here
+    P = (Tcold_out - Hx.temp_cold)/(Hx.temp_hot - Hx.temp_cold)  #temperature effectiveness
+    R = (Hx.temp_hot - Thot_out_init)/(Tcold_out - Hx.temp_cold) #heat capacity ratio
+    N = Hx.N_shell
+    F = find_F(P, R, N)
 
     Delta_T1 = Hx.temp_hot - Tcold_out
     Delta_T2 = Thot_out_init - Hx.temp_cold

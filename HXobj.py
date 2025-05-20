@@ -1,12 +1,12 @@
 import numpy as np
 
 class HeatExchanger:
-    def __init__ (self, tube_count: int, baffle_count: int, type: str,Passes, N_shell = 1):
+    def __init__ (self, tube_count: int, baffle_count: int, type: str, passes: int, N_shell: int):
         # Required attributes
         self.tube_count= tube_count
         self.baffle_count= baffle_count
         self.type = type
-        self.passes = Passes
+        self.passes = passes
         self.N_shell = N_shell
 
     # Optional attributes with default values
