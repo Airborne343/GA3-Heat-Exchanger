@@ -3,7 +3,7 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-#Hx = HeatExchanger(tube_count = 1, baffle_count = 9, type = "triangle", passes = 2)
+Hx = HeatExchanger(length = 0.35, tube_count = 1, baffle_count = 9, type = "triangle", passes = 2, N_shell = 1)
 
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop

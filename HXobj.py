@@ -1,19 +1,19 @@
 import numpy as np
 
 class HeatExchanger:
-    def __init__ (self, tube_count: int, baffle_count: int, type: str, passes: int, N_shell: int):
+    def __init__ (self, length: int, tube_count: int, baffle_count: int, type: str, passes: int, N_shell: int):
         # Required attributes
         self.tube_count= tube_count
         self.baffle_count= baffle_count
         self.type = type
         self.passes = passes
         self.N_shell = N_shell
+        self.length = length
 
     # Optional attributes with default values
         self.tube_ID = 6/1000 # in meters
         self.tube_OD = 8/1000  # in meters
         self.pitch = self.tube_ID + self.tube_OD # in meters
-        self.length = 0.35 # in meters
         self.D_shell = 0.064 # in meters
         self.baffle_width = self.length/(self.baffle_count + 1)
 
@@ -30,8 +30,10 @@ class HeatExchanger:
 
         if self.type.lower() == "triangle":
             self.a = 0.20
+            self.c = 0.20
         elif self.type.lower() == "square":
             self.a = 0.34
+            self.c = 0.15
         else:
             raise ValueError("Invalid heat exchanger type. Use 'triangle' or 'square'.")
         

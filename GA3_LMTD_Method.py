@@ -1,7 +1,7 @@
 import numpy as np
 import math
 from HXobj import HeatExchanger
-from F_factor_test import find_F
+from Datatables import find_F
 
 def heat_transfer_coefficient(mhot, mcold, Hx):
     
@@ -15,8 +15,7 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     #outer heat convection coefficient
     V_shell = mcold/(Hx.density * Hx.area_shell)
     Re_shell = (Hx.density * V_shell * Hx.charc_D_shell)/Hx.dynamic_viscosity
-    c = 0.15 #constant
-    Nu_outer = c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)
+    Nu_outer = Hx.c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)    
     conv_coeff_outer = (Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD
 
     #heat conduction through walls
@@ -26,7 +25,7 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     return H
 
 #initialise variables
-Hx = HeatExchanger(tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
+Hx = HeatExchanger(length = 0.35, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
 m_hot = 0.47
 m_cold = 0.5
 A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID
