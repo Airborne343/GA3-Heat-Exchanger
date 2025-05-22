@@ -27,7 +27,17 @@ def P_drop_cold(mcold, Hx):
     #Calculating velocity, characteristic diameter and shell reynolds number
     Volflow = mcold/Hx.density
     V_shell = Volflow/Hx.area_shell
-    charc_D_shell = Hx.D_shell * (Hx.area_shell/Hx.area_pipe)
+
+    if Hx.type == "triangle":
+        D_e_const1 = 1.10
+        D_e_const2 = 0.917
+    if Hx.type == "square":
+        D_e_const1 = 1.27
+        D_e_const2 = 0.785
+    else:
+        raise("invalid type given, should be triangle or square")
+
+    charc_D_shell = D_e_const1 * (Hx.pitch ** 2 - D_e_const2 * Hx.tube_OD **2) / Hx.tube_OD
     Re_shell = (Hx.density * V_shell * charc_D_shell)/Hx.dynamic_viscosity
 
     #Working out pressure losses due to shell and nozzle exit
@@ -58,3 +68,8 @@ def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 1
 
     raise("Maximum iterations reached without convergence")
 
+
+mhot = iteration(P_drop_hot, Hx)
+mcold = iteration(P_drop_cold, Hx)
+print(mhot, mcold)
+print(Hotchic(mhot/Hx.density), Coldchic(mcold/Hx.density))
