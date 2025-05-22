@@ -1,5 +1,9 @@
 import numpy as np
+import pandas as pd
+import os
 from HXobj import HeatExchanger
+from hydraulicloss import P_drop_cold, P_drop_hot, iteration
+from GA3_ENTU_Method import heat_transfer_coefficient, effective_NTU
 
 #config list: N_tubes, shape (0/45 - square, 60 - triangle), pitch, N_shell, passes
 iterations = [[10, 'square', 12, 2, 2],
@@ -25,6 +29,8 @@ thickness = 0.005
 mass_limit = 1.17
 
 valid_designs = []
+hydraulic_results = []
+ENTU_results = [] #final
 
 for config in iterations:
     N_tubes, shape, pitch_mm, max_shells, max_passes = config
@@ -32,7 +38,7 @@ for config in iterations:
     tube_length = 3.5/N_tubes #for maximum heat transfer
     tube_length = min(3.5 / N_tubes, 0.35 - 0.11)
     Hx_length = tube_length + 0.11
-    
+
     for baffles in range(6, 11):
         for N_shell in [1, 2]:
             for passes in [2, 4]:
@@ -59,12 +65,12 @@ for config in iterations:
                         valid_designs.append({
                             'tubes': N_tubes,
                             'shape': shape,
-                            'pitch': pitch_mm,
+                            'pitch': pitch_m,
                             'baffles': baffles,
                             'passes': passes,
                             'shells': N_shell,
                             'tube_length': round(tube_length, 3),
-                            'hx_length': round(Hx_length, 3),
+                            'Hx_length': round(Hx_length, 3),
                             'total_mass': round(total_mass, 4)
                         })
                 
@@ -73,5 +79,80 @@ for config in iterations:
 
 valid_designs.sort(key=lambda x: x['tube_length'], reverse=True)
 
+# for design in valid_designs:
+#     print(design)
+
 for design in valid_designs:
-    print(design)
+    try:
+        Hx = HeatExchanger(
+            length = design['Hx_length'],
+            pitch = design['pitch'],
+            tube_count = design['tubes'],
+            baffle_count = design['baffles'],
+            type = design['shape'],
+            passes = design['passes'],
+            N_shell = design['shells']
+        )
+
+        mhot = iteration(P_drop_hot, Hx)
+        mcold = iteration(P_drop_cold, Hx)
+        Q_hot = mhot * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
+        Q_cold = mcold * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
+        Q_min = min(Q_hot, Q_cold)
+
+        hydraulic_results.append({
+            **design,
+            'mhot': round(mhot, 4),
+            'mcold': round(mcold, 4),
+            'Q_hot': round(Q_hot, 2),
+            'Q_cold': round(Q_cold, 2),
+            'Q_min': round(Q_min, 2),
+        })
+
+    except Exception as e:
+        print(f'Failed for design {design}: {e}')
+    
+hydraulic_results.sort(key=lambda x: x['Q_min'], reverse=True)
+
+# for result in hydraulic_results:
+#     print(result)
+
+for design in hydraulic_results:
+    try:
+        Hx = HeatExchanger(
+            length = design['Hx_length'],
+            pitch = design['pitch'],
+            tube_count = design['tubes'],
+            baffle_count = design['baffles'],
+            type = design['shape'],
+            passes = design['passes'],
+            N_shell = design['shells']
+        )
+
+        m_hot = design['mhot']
+        m_cold = design['mcold']
+
+        H = heat_transfer_coefficient(m_hot, m_cold, Hx)
+        NTU, eff, Thot_out, Tcold_out, q_abs = effective_NTU(Hx, H, m_hot, m_cold, Hx.temp_hot, Hx.temp_cold)
+
+        ENTU_results.append({
+            **design,
+            'NTU': NTU,
+            'Effectiveness': eff,
+            'Thot_out': Thot_out,
+            'Tcold_out': Tcold_out,
+            'Q_abs': q_abs
+        })
+
+    except Exception as e:
+        print(f"ENTU calculation failed for design {design}: {e}")
+
+ENTU_results.sort(key=lambda x: x['Q_abs'], reverse=True)
+
+for result in ENTU_results:
+    print(result)
+
+df = pd.DataFrame(ENTU_results)
+df.to_excel('GA3_HeatExchanger_Optimisation.xlsx', index = False)
+print("Results Exported! :D")
+print(os.getcwd())

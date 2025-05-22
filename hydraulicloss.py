@@ -3,7 +3,7 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-Hx = HeatExchanger(length = 0.35, tube_count = 1, baffle_count = 9, type = "triangle", passes = 2, N_shell = 1)
+Hx = HeatExchanger(length = 0.35, pitch = 0.012, tube_count = 1, baffle_count = 9, type = "triangle", passes = 2, N_shell = 1)
 
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
@@ -28,13 +28,14 @@ def P_drop_cold(mcold, Hx):
     Volflow = mcold/Hx.density
     V_shell = Volflow/Hx.area_shell
 
-    if Hx.type.lower() == "triangle":
+    if Hx.type == "triangle":
         D_e_const1 = 1.10
         D_e_const2 = 0.917
-    elif Hx.type.lower() == "square":
+    elif Hx.type == "square":
         D_e_const1 = 1.27
         D_e_const2 = 0.785
-
+    else:
+        raise Exception("invalid type given, should be triangle or square")
 
     charc_D_shell = D_e_const1 * (Hx.pitch ** 2 - D_e_const2 * Hx.tube_OD **2) / Hx.tube_OD
     Re_shell = (Hx.density * V_shell * charc_D_shell)/Hx.dynamic_viscosity

@@ -24,7 +24,7 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     return H
 
 #initialise variables
-Hx = HeatExchanger(length = 0.35, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
+Hx = HeatExchanger(length = 0.35, pitch = 0.012, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
 m_hot = 0.47
 m_cold = 0.5
 A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID
