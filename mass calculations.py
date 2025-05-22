@@ -1,7 +1,7 @@
 import numpy as np
 from HXobj import HeatExchanger
 
-Hx = HeatExchanger(length = 0.35, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
+Hx = HeatExchanger(length = 0.35, pitch = 0.012, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
 
 mass_limit = 1.20 #kg
 
@@ -18,7 +18,8 @@ o_rings011 = 0.8/1000 #kg for each ring
 o_rings036 = 5.3/1000 #kg for each ring
 
 # area of ABS sheet per baffle = pi/4 * (64 * 10^-3)^2 - (N * pi/4 * (8*10^-3)^2)
-baffle_area = (Hx.baffle_count/2) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) #assuming the 2 parts of 2 baffles can be combined into 1 (no you cant and i need to change this)
+baffle_area = (Hx.baffle_count) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * 0.7 #0.7 is arbitrary
+#assuming the 2 parts of 2 baffles can be combined into 1 (no you cant and i need to change this)
 tube_length = Hx.length - (4 * 0.025) - (2 * 0.005) #0.025 due to constraint on nozzle and 0.005 as each end plate adds 0.005 to overall length
 
 #resin volume (idk what thickness is yet)
