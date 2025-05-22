@@ -30,8 +30,10 @@ def Hotchic(qdot = None, p = None): #cm3/s to Pa
 
 #Tables for friction factor
 def Friction(Re = None, epsilon = 0.002, D = 8 ): #https://www.engineeringtoolbox.com/surface-roughness-ventilation-ducts-d_209.html
-    #Using Haarland equation
-    return (-1.8 * np.log10((epsilon / D / 3.7)**1.11 + 6.9 / Re))**-2
+    if Re < 2000:
+        return 64/Re
+    else:
+        return (-1.8 * np.log10((epsilon / D / 3.7)**1.11 + 6.9 / Re))**-2
 
 
 def Kc(sigma, Re):
