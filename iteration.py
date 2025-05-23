@@ -39,7 +39,7 @@ for config in iterations:
     tube_length = min(3.5 / N_tubes, 0.35 - 0.11)
     Hx_length = tube_length + 0.11
 
-    baffleheights = np.linspace(0.5, 0.85, 20)
+    baffleheights = np.arange(0.5, 0.85, 0.025)
 
     for baffles in range(6, 11):
         for baffle_height in baffleheights:
@@ -50,20 +50,19 @@ for config in iterations:
 
                     try:
                         Hx = HeatExchanger(length = Hx_length, pitch = pitch_m, tube_count = N_tubes,  baffle_count = baffles, type = shape, passes = passes, N_shell = N_shell, rows = rows, bundle_height = bundle_height, baffle_height = baffle_height)
-                        baffle_area = baffles * ((np.pi/4 * (Hx.D_shell)**2) - N_tubes *(np.pi/4 * (Hx.tube_OD)**2)) * 0.7
-                        resin_vol = 2 * ((np.pi / 4 * Hx.D_shell**2) -
-                                        N_tubes * (np.pi / 4 * Hx.tube_OD**2)) * thickness \
-                                    + 2 * (np.pi / 4 * Hx.D_shell**2) * thickness
+                        windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
+                        baffle_area = (Hx.baffle_count) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2) - windowarea)
+                        resin_vol = (2 * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * 0.009) + (2 * (np.pi/4 * (Hx.D_shell)**2) * 0.007)
                         
                         mass_resin = rho_resin * resin_vol
                         mass_baffle = baffle_area * mass_ABS_pua
                         mass_shell = mass_shell_pul * Hx.length
                         mass_tube = N_tubes * mass_tube_pul * tube_length
                         mass_rings = 2 * o_rings011 + 2 * o_rings036
-
+                        mass_splitter = tube_length * 0.15
                         
-                        total_mass = mass_resin + mass_baffle + mass_nozzles + mass_shell + mass_tube + mass_rings
-
+                        total_mass = mass_resin + mass_baffle + mass_nozzles + mass_shell + mass_tube + mass_rings + mass_splitter
+                        
                         if total_mass <= mass_limit:
                             valid_designs.append({
                                 'tubes': N_tubes,
@@ -72,11 +71,18 @@ for config in iterations:
                                 'baffles': baffles,
                                 'passes': passes,
                                 'shells': N_shell,
-                                'tube_length': round(tube_length, 3),
-                                'Hx_length': round(Hx_length, 3),
-                                'total_mass': round(total_mass, 4),
+                                'tube_length': round(tube_length, 5),
+                                'Hx_length': round(Hx_length, 5),
+                                'resin_mass': round(mass_resin, 5),
+                                'baffle_mass': round(mass_baffle, 5),
+                                'shell_mass': round(mass_shell, 5),
+                                'tube_mass': round(mass_tube, 5),
+                                'rings_mass': round(mass_rings,5),
+                                'splitter_mass': round(mass_splitter,5),
+                                'total_mass': round(total_mass, 5),
                                 'baffle_height' : baffle_height,
-                                'bundle_height' : bundle_height 
+                                'bundle_height' : bundle_height,
+                                'rows': rows 
                             })
                     
                     except Exception as e:
@@ -96,7 +102,10 @@ for design in valid_designs:
             baffle_count = design['baffles'],
             type = design['shape'],
             passes = design['passes'],
-            N_shell = design['shells']
+            N_shell = design['shells'],
+            baffle_height = design['baffle_height'],
+            bundle_height = design['bundle_height'],
+            rows = design['rows']
         )
 
         mhot = iteration(P_drop_hot, Hx)
@@ -131,7 +140,10 @@ for design in hydraulic_results:
             baffle_count = design['baffles'],
             type = design['shape'],
             passes = design['passes'],
-            N_shell = design['shells']
+            N_shell = design['shells'],
+            baffle_height = design['baffle_height'],
+            bundle_height = design['bundle_height'],
+            rows = design['rows']
         )
 
         m_hot = design['mhot']

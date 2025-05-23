@@ -3,8 +3,7 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "60", passes = 2, N_shell = 1, pitch = 12/1000, baffle_height= 0.9)
-
+# Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "60", passes = 2, N_shell = 1, pitch = 12/1000, baffle_height= 0.7, bundle_height=0.7, rows=4)
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
 
@@ -101,10 +100,10 @@ def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 1
 
     raise("Maximum iterations reached without convergence")
 
-P_drop_cold(0.5, Hx)
+# P_drop_cold(0.5, Hx)
 
 
-mhot = iteration(P_drop_hot, Hx)
-mcold = iteration(P_drop_cold, Hx)
-print(mhot, mcold)
-print(Hotchic(mhot/Hx.density), Coldchic(mcold/Hx.density))
+# mhot = iteration(P_drop_hot, Hx)
+# mcold = iteration(P_drop_cold, Hx)
+# print(mhot, mcold)
+# print(Hotchic(mhot/Hx.density), Coldchic(mcold/Hx.density))
