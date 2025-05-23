@@ -17,8 +17,8 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     Nu_outer = Hx.c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)
     #conv_coeff_outer_factor
     J_i = np.exp(Hx.A + Hx.B*np.log(Re_shell) + Hx.C*(np.log(Re_shell)**2) + Hx.D(Re_shell**4) + Hx.E*(np.log(Re_shell)**5)) #tube_arrangement_correction
-    J_c = 0.55 + 0.72*Hx.
-    conv_coeff_outer = ((Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD) * J_i
+    J_c = 0.55 + 0.72*Hx.crossflow_prop
+    conv_coeff_outer = ((Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD) * J_i * J_c
 
     #heat conduction through walls
     conv_walls = (Hx.inner_surface_area * np.log(Hx.tube_OD/Hx.tube_ID))/(2*np.pi*Hx.tube_heat_conductivity *Hx.length)
@@ -27,7 +27,7 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     return H
 
 #initialise variables
-Hx = HeatExchanger(length = 0.35, pitch = 0.012, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
+Hx = HeatExchanger(length = 0.35, pitch = 0.012, tube_count = 13, baffle_count = 9, type = "60", passes = 1, N_shell = 1)
 m_hot = 0.47
 m_cold = 0.5
 A_ht = Hx.tube_count * np.pi * Hx.length * Hx.tube_ID

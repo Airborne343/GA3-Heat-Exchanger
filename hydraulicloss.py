@@ -3,7 +3,7 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "triangle", passes = 2, N_shell = 1, pitch = 12)
+Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "60", passes = 2, N_shell = 1, pitch = 12/1000, bundle_height = 0.4)
 
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
@@ -24,7 +24,7 @@ def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
     P_total = P_tube + P_ends + P_nozzle + P_pipe
     return [P_total - Hotchic(qdot = Volflow), P_total, Hotchic(qdot = Volflow)]
 
-def P_drop_cold(mcold, Hx):
+def P_drop_cold_old(mcold, Hx):
     #Calculating velocity, characteristic diameter and shell reynolds number
     Volflow = mcold/Hx.density
     V_shell = Volflow/Hx.area_shell
@@ -48,6 +48,39 @@ def P_drop_cold(mcold, Hx):
 
     return [ploss_cold_tot - Coldchic(qdot = Volflow), ploss_cold_tot, Coldchic(qdot = Volflow)]
 
+def P_drop_cold(mcold, Hx):
+    #Calculating velocity, characteristic diameter and shell reynolds number
+    massvelocity = mcold / Hx.area_shell
+
+    if Hx.type == "60":
+        D_e_const1 = 1.10
+        D_e_const2 = 0.917
+    elif Hx.type == "0" or Hx.type == "45":
+        D_e_const1 = 1.27
+        D_e_const2 = 0.785
+
+    charc_D_shell = D_e_const1 * (Hx.pitch ** 2 - D_e_const2 * Hx.tube_OD **2) / Hx.tube_OD
+    Re_shell = (massvelocity * charc_D_shell)/Hx.dynamic_viscosity
+
+    euler_coeff_dict = {"0": [0.267, 0.249e4, -0.927e7, 0.10e11, 0], "45" :[0.245, 0.339e4, -0.938e7, 0.132e11, -0.599e13], "60" :[0.245, 0.339e4, -0.938e7, 0.132e11, -0.599e13]}
+    eulercoeff = euler_coeff_dict[Hx.type][0] + euler_coeff_dict[Hx.type][1]/ (Re_shell) + euler_coeff_dict[Hx.type][2]/ (Re_shell**2) + euler_coeff_dict[Hx.type][3]/ (Re_shell**3) + euler_coeff_dict[Hx.type][4]/ (Re_shell**4) 
+
+    maxdynamicpressure = 0.5*massvelocity**2 / Hx.density
+
+    P_drop_crossflow = maxdynamicpressure*eulercoeff*(Hx.baffle_count + 1) * Hx.N_shell * Hx.rows
+
+    windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*Hx.baffle_height) - np.sin(2*np.arccos(1-2*Hx.baffle_height)))
+    P_drop_window = 2*maxdynamicpressure*(Hx.area_shell/windowarea) * (1 + 0.3*(1-Hx.crossflow_prop)) * Hx.baffle_count * Hx.N_shell
+
+    V_nozzle = mcold/(Hx.density * Hx.area_nozzle)
+    ploss_nozzle = 2 * 0.5 * Hx.density * (V_nozzle**2)
+    P_pipe = 15840 * (1000*mcold/(0.6580*Hx.density))**2    #This is taken from the max flow point of the cold chic
+
+    ploss_cold_tot = P_drop_crossflow +P_drop_window + ploss_nozzle +  P_pipe
+
+
+    return [ploss_cold_tot - Coldchic(qdot = mcold/Hx.density), ploss_cold_tot, Coldchic(qdot = mcold.Hx.density)]
+
 def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
     massflow = initialmass
 
@@ -65,6 +98,8 @@ def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 1
         massflow = massflow_new
 
     raise("Maximum iterations reached without convergence")
+
+P_drop_cold(0.5, Hx)
 
 
 mhot = iteration(P_drop_hot, Hx)
