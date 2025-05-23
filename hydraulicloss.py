@@ -72,6 +72,8 @@ def P_drop_cold(mcold, Hx):
     windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*Hx.baffle_height) - np.sin(2*np.arccos(1-2*Hx.baffle_height)))
     P_drop_window = 2*maxdynamicpressure*(Hx.area_shell/windowarea) * (1 + 0.3*(1-Hx.crossflow_prop)) * Hx.baffle_count * Hx.N_shell
 
+    
+
     V_nozzle = mcold/(Hx.density * Hx.area_nozzle)
     ploss_nozzle = 2 * 0.5 * Hx.density * (V_nozzle**2)
     P_pipe = 15840 * (1000*mcold/(0.6580*Hx.density))**2    #This is taken from the max flow point of the cold chic
