@@ -6,16 +6,16 @@ from hydraulicloss import P_drop_cold, P_drop_hot, iteration
 from GA3_ENTU_Method import heat_transfer_coefficient, effective_NTU
 
 #config list: N_tubes, shape (0/45 - square, 60 - triangle), pitch, N_shell, passes
-iterations = [[10, 'square', 12, 2, 2, 5, 0.66],
-[16, 'square', 12, 2, 4, 4, 0.69],
-[12, 'square', 12, 2, 2, 5, 0.66],
-[12, 'square', 12, 2, 4, 4, 0.781],
-[10, 'square', 14, 2, 2, 5, 0.75],
-[16, 'triangle', 12, 2, 2, 5, 0.781],
-[10, 'triangle', 14, 2, 2, 3, 0.5],
-[18, 'triangle', 12, 2, 2, 5, 0.875],
-[16, 'triangle', 12, 2, 4, 5, 0.875],
-[10, 'triangle', 12, 2, 2, 4, 0.812]]
+iterations = [[10, '45', 12, 2, 2, 5, 0.66],
+[16, '0', 12, 2, 4, 4, 0.69],
+[12, '45', 12, 2, 2, 5, 0.66],
+[12, '0', 12, 2, 4, 4, 0.781],
+[10, '45', 14, 2, 2, 5, 0.75],
+[16, '60', 12, 2, 2, 5, 0.781],
+[10, '60', 14, 2, 2, 3, 0.5],
+[18, '60', 12, 2, 2, 5, 0.875],
+[16, '60', 12, 2, 4, 5, 0.875],
+[10, '60', 12, 2, 2, 4, 0.812]]
 
 #constants
 mass_shell_pul = 0.650
@@ -39,8 +39,10 @@ for config in iterations:
     tube_length = min(3.5 / N_tubes, 0.35 - 0.11)
     Hx_length = tube_length + 0.11
 
+    baffleheights = np.linspace(0.5, 0.85, 20)
+
     for baffles in range(6, 11):
-        for baffle_height in range(0.5,0.8, 0.05):
+        for baffle_height in baffleheights:
             for N_shell in [1, 2]:
                 for passes in [2, 4]:
                     if N_shell > max_shells or passes > max_passes:
