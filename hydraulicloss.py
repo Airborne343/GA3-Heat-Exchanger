@@ -79,7 +79,7 @@ def P_drop_cold(mcold, Hx):
     ploss_cold_tot = P_drop_crossflow +P_drop_window + ploss_nozzle +  P_pipe
 
 
-    return [ploss_cold_tot - Coldchic(qdot = mcold/Hx.density), ploss_cold_tot, Coldchic(qdot = mcold.Hx.density)]
+    return [ploss_cold_tot - Coldchic(qdot = mcold/Hx.density), ploss_cold_tot, Coldchic(qdot = mcold/Hx.density)]
 
 def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
     massflow = initialmass
