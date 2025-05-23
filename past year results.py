@@ -1,5 +1,75 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+import os
+from HXobj import HeatExchanger
+from hydraulicloss import iteration, Friction, Kc, Ke
+from GA3_ENTU_Method import heat_transfer_coefficient, effective_NTU
+
+
+final_result = []
+
+def P_drop_hot(mhot, Hx, hotpoly): #Function to calculate hot side pressure drop
+
+    #Working out velocity, dynamic pressure and reynolds number inside tube
+    Volflow = mhot/Hx.density
+    V_pipe = Volflow/(Hx.area_tubes/Hx.passes)
+    q_pipe = 1/2 * Hx.density * V_pipe ** 2
+    Re_pipe = Hx.density * V_pipe * Hx.tube_ID / Hx.dynamic_viscosity
+
+    #Working out three sources of pressure drop, tube friction, end losses for tubes and inlet nozzle drops
+    P_pipe = q_pipe * Hx.length / Hx.tube_ID * Friction(Re_pipe)
+    P_ends = q_pipe * (Kc(Hx.sigma, Re_pipe) + Ke(Hx.sigma, Re_pipe)) * Hx.passes
+    P_nozzle = 0.5 * Hx.density * (Volflow/Hx.area_nozzle)**2 * 2
+
+    #Summing pressure losses and combining
+    P_total = P_pipe + P_ends + P_nozzle
+    return [P_total - hotpoly(Volflow), P_total, hotpoly(Volflow)]
+
+def P_drop_cold(mcold, Hx, coldpoly):
+    #Calculating velocity, characteristic diameter and shell reynolds number
+    Volflow = mcold/Hx.density
+    V_shell = Volflow/Hx.area_shell
+
+    if Hx.type == "triangle":
+        D_e_const1 = 1.10
+        D_e_const2 = 0.917
+    elif Hx.type == "square":
+        D_e_const1 = 1.27
+        D_e_const2 = 0.785
+    else:
+        raise Exception("invalid type given, should be triangle or square")
+
+    charc_D_shell = D_e_const1 * (Hx.pitch ** 2 - D_e_const2 * Hx.tube_OD **2) / Hx.tube_OD
+    Re_shell = (Hx.density * V_shell * charc_D_shell)/Hx.dynamic_viscosity
+
+    #Working out pressure losses due to shell and nozzle exit
+    ploss_shell = 4 * Hx.a * ((Re_shell)**(-0.15)) * Hx.tube_count * Hx.density * ((V_shell)**2)
+    V_nozzle = mcold/(Hx.density * Hx.area_nozzle)
+    ploss_nozzle = 2 * 0.5 * Hx.density * (V_nozzle**2)
+
+
+    ploss_cold_tot = ploss_nozzle + ploss_shell
+
+    return [ploss_cold_tot - coldpoly(Volflow), ploss_cold_tot, coldpoly(Volflow)]
+
+def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
+    massflow = initialmass
+
+    for i in range(maxiter):
+        #Working out 
+        p = pressurefunction(massflow, Hx)[0]
+        dp_dq = (pressurefunction(massflow * 1.05, Hx)[0] - pressurefunction(massflow * 0.95, Hx)[0]) / (2 * 0.05 * massflow)
+
+        #Newton raphson method to calculate pressurefunction drop
+        massflow_new = massflow - p / dp_dq
+        
+        if abs(massflow - massflow_new) < massflow * tol:
+            return massflow
+
+        massflow = massflow_new
+
+    raise("Maximum iterations reached without convergence")
 
 ##2024
 # COLD SIDE data
@@ -113,17 +183,179 @@ result_repository = {
         "HX_baffle_count": 8,
         "HX_shape": "triangle",
         "HX_passes": 2,
-        "HX_shells": 1
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
     },
+
     "Group B - 2024": {
         "year": 2024,
         "group_name": "Group B",
         "HX_Length": 0.329,
-        "HX_pitch": 11.5/1000,
+        "HX_pitch": 16/1000,
         "HX_tube_count": 12,
         "HX_baffle_count": 8,
         "HX_shape": "triangle",
         "HX_passes": 2,
-        "HX_shells": 1
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
     },
-} #work on this after finding out the pitch
+
+    "Group C - 2024": {
+        "year": 2024,
+        "group_name": "Group C",
+        "HX_Length": 0.360,
+        "HX_pitch": 12/1000,
+        "HX_tube_count": 12,
+        "HX_baffle_count": 8,
+        "HX_shape": "triangle",
+        "HX_passes": 2,
+        "HX_shells": 2,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+    "Group D - 2024": {
+        "year": 2024,
+        "group_name": "Group D",
+        "HX_Length": 0.320,
+        "HX_pitch": 12/1000,
+        "HX_tube_count": 14,
+        "HX_baffle_count": 6,
+        "HX_shape": "triangle",
+        "HX_passes": 2,
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+    "Group E - 2024": {
+        "year": 2024,
+        "group_name": "Group E",
+        "HX_Length": 0.320,
+        "HX_pitch": 13/1000,
+        "HX_tube_count": 15,
+        "HX_baffle_count": 7,
+        "HX_shape": "triangle",
+        "HX_passes": 3,
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+    "Group A - 2023": {
+        "year": 2023,
+        "group_name": "Group A",
+        "HX_Length": 0.334,
+        "HX_pitch": 15.2/1000,
+        "HX_tube_count": 14,
+        "HX_baffle_count": 10,
+        "HX_shape": "triangle",
+        "HX_passes": 2,
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2023,
+        "coldpoly": cold_poly_2023
+    },
+
+    "Group B - 2023": {
+        "year": 2023,
+        "group_name": "Group B",
+        "HX_Length": 0.271,
+        "HX_pitch": 16/1000,
+        "HX_tube_count": 12,
+        "HX_baffle_count": 8,
+        "HX_shape": "triangle",
+        "HX_passes": 2,
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+    "Group C - 2024": {
+        "year": 2024,
+        "group_name": "Group C",
+        "HX_Length": 0.360,
+        "HX_pitch": 12/1000,
+        "HX_tube_count": 12,
+        "HX_baffle_count": 8,
+        "HX_shape": "triangle",
+        "HX_passes": 2,
+        "HX_shells": 2,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+    "Group D - 2024": {
+        "year": 2024,
+        "group_name": "Group D",
+        "HX_Length": 0.320,
+        "HX_pitch": 12/1000,
+        "HX_tube_count": 14,
+        "HX_baffle_count": 6,
+        "HX_shape": "triangle",
+        "HX_passes": 2,
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+    "Group E - 2024": {
+        "year": 2024,
+        "group_name": "Group E",
+        "HX_Length": 0.320,
+        "HX_pitch": 13/1000,
+        "HX_tube_count": 15,
+        "HX_baffle_count": 7,
+        "HX_shape": "triangle",
+        "HX_passes": 3,
+        "HX_shells": 1,
+        "hotpoly": hot_poly_2024,
+        "coldpoly": cold_poly_2024
+    },
+
+}
+
+for result in result_repository.values():
+    try:
+        Hx = HeatExchanger(
+            length = result['HX_Length'],
+            pitch = result['HX_pitch'],
+            tube_count = result['HX_tube_count'],
+            baffle_count = result['HX_baffle_count'],
+            type = result['HX_shape'],
+            passes = result['HX_passes'],
+            N_shell = result['HX_shells']
+        )
+
+        mhot = iteration(lambda m, Hx: P_drop_hot(m, Hx, result['hotpoly']), Hx)
+        mcold = iteration(lambda m, Hx: P_drop_cold(m, Hx, result['coldpoly']), Hx)
+        Q_hot = mhot * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
+        Q_cold = mcold * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
+        Q_min = min(Q_hot, Q_cold)
+        H = heat_transfer_coefficient(mhot, mcold, Hx)
+        NTU, eff, Thot_out, Tcold_out, q_abs = effective_NTU(Hx, H, mhot, mcold, Hx.temp_hot, Hx.temp_cold)
+
+        filtered_result = {k: v for k, v in result.items() if k not in ('hotpoly', 'coldpoly')}
+
+        filtered_result.update({
+            'mhot': round(mhot, 4),
+            'mcold': round(mcold, 4),
+            'Q_hot': round(Q_hot, 2),
+            'Q_cold': round(Q_cold, 2),
+            'Q_min': round(Q_min, 2),
+            'NTU': NTU,
+            'Effectiveness': eff,
+            'Thot_out': Thot_out,
+            'Tcold_out': Tcold_out,
+            'Q_abs': q_abs
+        })
+
+        final_result.append(filtered_result)
+
+    except Exception as e:
+        print(f"Calculations failed for design {result}: {e}")
+
+# print(final_result)
+df = pd.DataFrame(final_result)
+df.to_excel('past_year_heat_exchanger_results.xlsx', index=False)

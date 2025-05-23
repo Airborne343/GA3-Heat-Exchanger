@@ -63,10 +63,10 @@ def effective_NTU(HX, H, m_hot, m_cold, Thot_in = 60, Tcold_in = 20):
 
     return [NTU, eff, Thot_out, Tcold_out, q_abs]
 
-result = effective_NTU(Hx, H, m_hot, m_cold, Hx.temp_hot, Hx.temp_cold)
+# result = effective_NTU(Hx, H, m_hot, m_cold, Hx.temp_hot, Hx.temp_cold)
 
-print(f"ENTU NTU: {result[0]:.3f}")
-print(f"ENTU Effectiveness: {result[1]:.3f}")
-print(f"ENTU Hot Side Outlet Temperature: {result[2]:.2f} C")
-print(f"ENTU Cold Side Outlet Temperature: {result[3]:.2f} C")
-print(f"ENTU Heat Transfer: {result[4]:.2f} W")
+# print(f"ENTU NTU: {result[0]:.3f}")
+# print(f"ENTU Effectiveness: {result[1]:.3f}")
+# print(f"ENTU Hot Side Outlet Temperature: {result[2]:.2f} C")
+# print(f"ENTU Cold Side Outlet Temperature: {result[3]:.2f} C")
+# print(f"ENTU Heat Transfer: {result[4]:.2f} W")
