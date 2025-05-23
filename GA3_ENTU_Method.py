@@ -16,9 +16,9 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     Re_shell = (Hx.density * V_shell * Hx.charc_D_shell)/Hx.dynamic_viscosity
     Nu_outer = Hx.c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)
     #conv_coeff_outer_factor
-    J_i = np.exp(Hx.A + Hx.B*np.log(Re_shell) + Hx.C*(np.log(Re_shell)**2) + Hx.D(Re_shell**4) + Hx.E*(np.log(Re_shell)**5)) #tube_arrangement_correction
+    #J_i = np.exp(Hx.A + Hx.B*np.log(Re_shell) + Hx.C*(np.log(Re_shell)**2) + Hx.D*(Re_shell**4) + Hx.E*(np.log(Re_shell)**5)) #tube_arrangement_correction
     J_c = 0.55 + 0.72*Hx.crossflow_prop
-    conv_coeff_outer = ((Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD) * J_i * J_c
+    conv_coeff_outer = ((Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD) * J_c
 
     #heat conduction through walls
     conv_walls = (Hx.inner_surface_area * np.log(Hx.tube_OD/Hx.tube_ID))/(2*np.pi*Hx.tube_heat_conductivity *Hx.length)
