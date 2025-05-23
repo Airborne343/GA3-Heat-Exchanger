@@ -17,6 +17,7 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     Nu_outer = Hx.c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)
     #conv_coeff_outer_factor
     J_i = np.exp(Hx.A + Hx.B*np.log(Re_shell) + Hx.C*(np.log(Re_shell)**2) + Hx.D(Re_shell**4) + Hx.E*(np.log(Re_shell)**5)) #tube_arrangement_correction
+    J_c = 0.55 + 0.72*Hx.
     conv_coeff_outer = ((Nu_outer * Hx.water_heat_conductivity)/Hx.tube_OD) * J_i
 
     #heat conduction through walls
