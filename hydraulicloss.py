@@ -3,7 +3,7 @@ from Datatables import Friction, Kc, Ke, Hotchic, Coldchic
 from HXobj import HeatExchanger 
 import matplotlib.pyplot as plt
 
-Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "60", passes = 2, N_shell = 1, pitch = 12/1000, bundle_height = 0.4)
+Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "60", passes = 2, N_shell = 1, pitch = 12/1000, baffle_height= 0.9)
 
 
 def P_drop_hot(mhot, Hx): #Function to calculate hot side pressure drop
@@ -69,16 +69,16 @@ def P_drop_cold(mcold, Hx):
 
     P_drop_crossflow = maxdynamicpressure*eulercoeff*(Hx.baffle_count + 1) * Hx.N_shell * Hx.rows
 
-    windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*Hx.baffle_height) - np.sin(2*np.arccos(1-2*Hx.baffle_height)))
+    windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
     P_drop_window = 2*maxdynamicpressure*(Hx.area_shell/windowarea) * (1 + 0.3*(1-Hx.crossflow_prop)) * Hx.baffle_count * Hx.N_shell
 
-    
 
     V_nozzle = mcold/(Hx.density * Hx.area_nozzle)
     ploss_nozzle = 2 * 0.5 * Hx.density * (V_nozzle**2)
     P_pipe = 15840 * (1000*mcold/(0.6580*Hx.density))**2    #This is taken from the max flow point of the cold chic
 
     ploss_cold_tot = P_drop_crossflow +P_drop_window + ploss_nozzle +  P_pipe
+    print(P_drop_crossflow, P_drop_window)
 
 
     return [ploss_cold_tot - Coldchic(qdot = mcold/Hx.density), ploss_cold_tot, Coldchic(qdot = mcold/Hx.density)]
