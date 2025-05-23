@@ -31,9 +31,22 @@ class HeatExchanger:
         if self.type.lower() == "triangle":
             self.a = 0.20
             self.c = 0.20
+            #outer conv coeff
+            self.A = 0.627615
+            self.B = -0.690640
+            self.C = -0.0507472
+            self.D = 0.0141049
+            self.E = -0.000937714
+
         elif self.type.lower() == "square":
             self.a = 0.34
             self.c = 0.15
+            #outer conv coeff
+            self.A = 0.374177
+            self.B = -0.671577
+            self.C = -0.0784051
+            self.D = 0.02507191
+            self.E = -0.00145983
         else:
             raise ValueError("Invalid heat exchanger type. Use 'triangle' or 'square'.")
         
