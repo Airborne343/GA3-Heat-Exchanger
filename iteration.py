@@ -57,7 +57,8 @@ for config in iterations:
                         
                         mass_resin = rho_resin * resin_vol
                         mass_baffle = baffle_area * mass_ABS_pua
-                        mass_shell = mass_shell_pul * Hx.length
+                        print(mass_baffle)
+                        mass_shell = mass_shell_pul * Hx.length 
                         mass_tube = N_tubes * mass_tube_pul * tube_length
                         mass_rings = 2 * o_rings011 + 2 * o_rings036
 
@@ -154,8 +155,8 @@ for design in hydraulic_results:
 
 ENTU_results.sort(key=lambda x: x['Q_abs'], reverse=True)
 
-for result in ENTU_results:
-    print(result)
+#for result in ENTU_results:
+    #print(result)
 
 df = pd.DataFrame(ENTU_results)
 df.to_excel('GA3_HeatExchanger_Optimisation (with new cooling code).xlsx', index = False)
