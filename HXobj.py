@@ -1,7 +1,7 @@
 import numpy as np
 
 class HeatExchanger:
-    def __init__ (self, length: int, pitch, tube_count: int, baffle_count: int, type: str, passes: int, N_shell: int, baffle_height = 0.7, bundle_height = 0.7, rows = 4):
+    def __init__ (self, length: int, pitch, tube_count: int, baffle_count: int, type: str, passes: int, N_shell: int, baffle_height: float, bundle_height: float, rows: int):
         # Required attributes
         self.tube_count= tube_count
         self.baffle_count= baffle_count

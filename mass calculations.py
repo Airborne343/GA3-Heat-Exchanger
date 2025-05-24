@@ -1,7 +1,7 @@
 import numpy as np
 from HXobj import HeatExchanger
 
-Hx = HeatExchanger(length = 0.35, pitch = 0.012, tube_count = 13, baffle_count = 9, type = "triangle", passes = 1, N_shell = 1)
+Hx = HeatExchanger(length = 0.35, tube_count = 10, baffle_count = 9, type = "60", passes = 2, N_shell = 1, pitch = 12/1000, baffle_height= 0.7, bundle_height=0.7, rows=4)
 
 mass_limit = 1.20 #kg
 
@@ -18,13 +18,15 @@ o_rings011 = 0.8/1000 #kg for each ring
 o_rings036 = 5.3/1000 #kg for each ring
 
 # area of ABS sheet per baffle = pi/4 * (64 * 10^-3)^2 - (N * pi/4 * (8*10^-3)^2)
-baffle_area = (Hx.baffle_count) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * 0.7 #0.7 is arbitrary
+windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
+baffle_area = (Hx.baffle_count) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2) - windowarea)
 #assuming the 2 parts of 2 baffles can be combined into 1 (no you cant and i need to change this)
 tube_length = Hx.length - (4 * 0.025) - (2 * 0.005) #0.025 due to constraint on nozzle and 0.005 as each end plate adds 0.005 to overall length
 
 #resin volume (idk what thickness is yet)
-thickness = 0.005
-resin_vol =  (2 * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * thickness) + (2 * (np.pi/4 * (Hx.D_shell)**2) * thickness)
+tubesheet_thickness = 0.009
+endplate_thickness = 0.007
+resin_vol =  (2 * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * tubesheet_thickness) + (2 * (np.pi/4 * (Hx.D_shell)**2) * endplate_thickness)
 
 mass_resin = rho_resin * resin_vol
 mass_baffle = baffle_area * mass_ABS_pua

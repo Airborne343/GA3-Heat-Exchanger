@@ -32,12 +32,30 @@ valid_designs = []
 hydraulic_results = []
 ENTU_results = [] #final
 
+def massfunction(t_length, Hx):
+    Hx.length = t_length + 0.11
+
+    windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
+    baffle_area = (Hx.baffle_count) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2) - windowarea)
+    resin_vol = (2 * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * 0.009) + (2 * (np.pi/4 * (Hx.D_shell)**2) * 0.007)
+    
+    mass_resin = rho_resin * resin_vol
+    mass_baffle = baffle_area * mass_ABS_pua
+    mass_shell = mass_shell_pul * Hx.length
+    mass_tube = N_tubes * mass_tube_pul * t_length
+    mass_rings = 2 * o_rings011 + 2 * o_rings036
+    mass_splitter = t_length * 0.15
+
+    total_mass = mass_resin + mass_baffle + mass_nozzles + mass_shell + mass_tube + mass_rings + mass_splitter
+
+    return [total_mass - 1.1, total_mass]
+
+
+
+
 for config in iterations:
     N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height = config
-    pitch_m = pitch_mm/1000 #in meters
-    tube_length = 3.5/N_tubes #for maximum heat transfer
-    tube_length = min(3.5 / N_tubes, 0.35 - 0.11)
-    Hx_length = tube_length + 0.11
+    pitch_m = pitch_mm/1000 #in meter
 
     baffleheights = np.arange(0.5, 0.85, 0.025)
 
@@ -50,22 +68,17 @@ for config in iterations:
                     
                 
                     try:
-                        Hx = HeatExchanger(length = Hx_length, pitch = pitch_m, tube_count = N_tubes,  baffle_count = baffles, type = shape, passes = passes, N_shell = N_shell, rows = rows, bundle_height = bundle_height, baffle_height = baffle_height)
+
+                        Hx = HeatExchanger(length = 0.35, pitch = pitch_m, tube_count = N_tubes,  baffle_count = baffles, type = shape, passes = passes, N_shell = N_shell, rows = rows, bundle_height = bundle_height, baffle_height = baffle_height)
                         
-                        windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
-                        baffle_area = (Hx.baffle_count) * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2) - windowarea)
-                        resin_vol = (2 * ((np.pi/4 * (Hx.D_shell)**2) - Hx.tube_count *(np.pi/4 * (Hx.tube_OD)**2)) * 0.009) + (2 * (np.pi/4 * (Hx.D_shell)**2) * 0.007)
-                        
-                        mass_resin = rho_resin * resin_vol
-                        mass_baffle = baffle_area * mass_ABS_pua
-                        print(mass_baffle)
-                        mass_shell = mass_shell_pul * Hx.length 
-                        mass_tube = N_tubes * mass_tube_pul * tube_length
-                        mass_rings = 2 * o_rings011 + 2 * o_rings036
-                        mass_splitter = tube_length * 0.15
-                        
-                        total_mass = mass_resin + mass_baffle + mass_nozzles + mass_shell + mass_tube + mass_rings + mass_splitter
-                        
+                        t_length = iteration(massfunction, Hx, initialmass=0.25)
+                        tube_length = min(3.5 / N_tubes, t_length, 0.25)
+
+                        Hx_length = 0.11 + tube_length  # Adjust length with calculated tube_length
+                        Hx.length = Hx_length  # Update Hx with the new length
+
+                        total_mass = massfunction(tube_length, Hx)[1]
+                    
                         if total_mass <= mass_limit:
                             valid_designs.append({
                                 'tubes': N_tubes,
@@ -76,12 +89,6 @@ for config in iterations:
                                 'shells': N_shell,
                                 'tube_length': round(tube_length, 5),
                                 'Hx_length': round(Hx_length, 5),
-                                'resin_mass': round(mass_resin, 5),
-                                'baffle_mass': round(mass_baffle, 5),
-                                'shell_mass': round(mass_shell, 5),
-                                'tube_mass': round(mass_tube, 5),
-                                'rings_mass': round(mass_rings,5),
-                                'splitter_mass': round(mass_splitter,5),
                                 'total_mass': round(total_mass, 5),
                                 'baffle_height' : baffle_height,
                                 'bundle_height' : bundle_height,
@@ -169,10 +176,10 @@ for design in hydraulic_results:
 
 ENTU_results.sort(key=lambda x: x['Q_abs'], reverse=True)
 
-#for result in ENTU_results:
-    #print(result)
+for result in ENTU_results:
+    print(result)
 
 df = pd.DataFrame(ENTU_results)
-df.to_excel('GA3_HeatExchanger_Optimisation (with new cooling code).xlsx', index = False)
+df.to_excel('GA3_HeatExchanger_Optimisation (with length optimiser (capped length)).xlsx', index = False)
 print("Results Exported! :D")
 print(os.getcwd())
