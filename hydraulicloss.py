@@ -66,8 +66,7 @@ def P_drop_cold(mcold, Hx):
 
     P_drop_crossflow = maxdynamicpressure*eulercoeff*(Hx.baffle_count + 1) * Hx.N_shell * Hx.rows
 
-    windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
-    P_drop_window = 2*maxdynamicpressure*(Hx.area_shell/windowarea) * (1 + 0.3*(1-Hx.crossflow_prop)) * Hx.baffle_count * Hx.N_shell
+    P_drop_window = 2*maxdynamicpressure*(Hx.area_shell/Hx.windowarea) * (1 + 0.3*(1-Hx.crossflow_prop)) * Hx.baffle_count * Hx.N_shell
 
 
     V_nozzle = mcold/(Hx.density * Hx.area_nozzle)
@@ -76,7 +75,7 @@ def P_drop_cold(mcold, Hx):
 
     ploss_cold_tot = P_drop_crossflow +P_drop_window + ploss_nozzle +  P_pipe
 
-    return [ploss_cold_tot - Coldchic(qdot = mcold/Hx.density), ploss_cold_tot, Coldchic(qdot = mcold/Hx.density)]
+    return [ploss_cold_tot - Coldchic(qdot = mcold/Hx.density), ploss_cold_tot, P_drop_crossflow, P_drop_window]
 
 def iteration(pressurefunction, Hx, initialmass = 0.45, tol = 0.005, maxiter = 15):
     massflow = initialmass

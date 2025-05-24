@@ -180,6 +180,6 @@ for result in ENTU_results:
     print(result)
 
 df = pd.DataFrame(ENTU_results)
-df.to_excel('GA3_HeatExchanger_Optimisation (with length optimiser (capped length)).xlsx', index = False)
+df.to_excel('GA3_HeatExchanger_Optimisation (with configuration names).xlsx', index = False)
 print("Results Exported! :D")
 print(os.getcwd())
