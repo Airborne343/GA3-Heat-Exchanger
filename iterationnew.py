@@ -51,7 +51,6 @@ def massfunction(t_length, Hx):
     return [total_mass - 1.1, total_mass]
 
 
-
 for config in iterations:
     N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height, config_name = config
     pitch_m = pitch_mm/1000 #in meter
@@ -76,23 +75,22 @@ for config in iterations:
                         Hx_length = 0.11 + tube_length  # Adjust length with calculated tube_length
                         Hx.length = Hx_length  # Update Hx with the new length
 
+                        Arearatio = Hx.windowarea/Hx.area_shell
+
                         total_mass = massfunction(tube_length, Hx)[1]
                     
                         if total_mass <= mass_limit:
                             valid_designs.append({
                                 'config_name' : config_name,
-                                'tubes': N_tubes,
-                                'shape': shape,
                                 'pitch': pitch_m,
                                 'baffles': baffles,
+                                'baffle_height' : baffle_height,
+                                'bundle_height' : bundle_height,
                                 'passes': passes,
                                 'shells': N_shell,
                                 'tube_length': round(tube_length, 5),
-                                'Hx_length': round(Hx_length, 5),
                                 'total_mass': round(total_mass, 5),
-                                'baffle_height' : baffle_height,
-                                'bundle_height' : bundle_height,
-                                'rows': rows
+                                'Area ratio': Arearatio
                             })
                     
                     except Exception as e:
@@ -124,13 +122,15 @@ for design in valid_designs:
         Q_cold = mcold * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
         Q_min = min(Q_hot, Q_cold)
 
+        coldpressures = P_drop_cold(mcold, Hx)
+
         hydraulic_results.append({
             **design,
+            'P_drop_cold' : coldpressures[1],
+            'P_window' : coldpressures[3],
+            'P_crossflow' : coldpressures[2],
             'mhot': round(mhot, 4),
             'mcold': round(mcold, 4),
-            'Q_hot': round(Q_hot, 2),
-            'Q_cold': round(Q_cold, 2),
-            'Q_min': round(Q_min, 2),
         })
 
     except Exception as e:
@@ -164,10 +164,6 @@ for design in hydraulic_results:
 
         ENTU_results.append({
             **design,
-            'NTU': NTU,
-            'Effectiveness': eff,
-            'Thot_out': Thot_out,
-            'Tcold_out': Tcold_out,
             'Q_abs': q_abs
         })
 
