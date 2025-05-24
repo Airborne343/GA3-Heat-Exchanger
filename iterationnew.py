@@ -52,14 +52,13 @@ def massfunction(t_length, Hx):
 
 
 
-
 for config in iterations:
-    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height = config
+    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height, config_name = config
     pitch_m = pitch_mm/1000 #in meter
 
     baffleheights = np.arange(0.5, 0.85, 0.025)
 
-    for baffles in range(6, 11):
+    for baffles in range(4, 15):
         for baffle_height in baffleheights:
             for N_shell in [1, 2]:
                 for passes in [2, 4]:
@@ -81,6 +80,7 @@ for config in iterations:
                     
                         if total_mass <= mass_limit:
                             valid_designs.append({
+                                'config_name' : config_name,
                                 'tubes': N_tubes,
                                 'shape': shape,
                                 'pitch': pitch_m,
@@ -92,7 +92,7 @@ for config in iterations:
                                 'total_mass': round(total_mass, 5),
                                 'baffle_height' : baffle_height,
                                 'bundle_height' : bundle_height,
-                                'rows': rows 
+                                'rows': rows
                             })
                     
                     except Exception as e:
