@@ -15,7 +15,7 @@ def heat_transfer_coefficient(mhot, mcold, Hx):
     windowarea = (Hx.D_shell**2/8)*(2*np.arccos(1-2*(1-Hx.baffle_height)) - np.sin(2*np.arccos(1-2*(1-Hx.baffle_height))))
     V_window = mcold/(windowarea * Hx.density)
     V_shell = mcold/(Hx.density * Hx.area_shell)
-    Re_shell = (Hx.density * 0.9*V_shell + 0.1*V_window * Hx.tube_OD)/Hx.dynamic_viscosity
+    Re_shell = (Hx.density * (0.9*V_shell + 0.1*V_window) * Hx.tube_OD)/Hx.dynamic_viscosity
     Nu_outer = Hx.c * (Re_shell ** 0.6) * (Hx.Prandtl_no ** 0.3)
     #conv_coeff_outer_factor
     #J_i = np.exp(Hx.A + Hx.B*np.log(Re_shell) + Hx.C*(np.log(Re_shell)**2) + Hx.D*(Re_shell**4) + Hx.E*(np.log(Re_shell)**5)) #tube_arrangement_correction

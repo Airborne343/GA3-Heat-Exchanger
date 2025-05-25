@@ -81,16 +81,20 @@ for config in iterations:
                     
                         if total_mass <= mass_limit:
                             valid_designs.append({
-                                'config_name' : config_name,
+                                'config_name': config_name,
+                                'tubes': N_tubes,
+                                'shape': shape,
                                 'pitch': pitch_m,
                                 'baffles': baffles,
-                                'baffle_height' : baffle_height,
-                                'bundle_height' : bundle_height,
+                                'baffle_height': baffle_height,
+                                'bundle_height': bundle_height,
+                                'rows': rows,
                                 'passes': passes,
                                 'shells': N_shell,
                                 'tube_length': round(tube_length, 5),
+                                'Hx_length': round(Hx_length, 5),
                                 'total_mass': round(total_mass, 5),
-                                'Area ratio': Arearatio
+                                'Area_ratio': Arearatio
                             })
                     
                     except Exception as e:
@@ -131,13 +135,13 @@ for design in valid_designs:
             'P_crossflow' : coldpressures[2],
             'mhot': round(mhot, 4),
             'mcold': round(mcold, 4),
+            'Q_min': round(Q_min, 2)
         })
 
     except Exception as e:
         print(f'Failed for design {design}: {e}')
-    
-hydraulic_results.sort(key=lambda x: x['Q_min'], reverse=True)
 
+hydraulic_results.sort(key=lambda x: x['Q_min'], reverse=True)
 # for result in hydraulic_results:
 #     print(result)
 
@@ -176,6 +180,6 @@ for result in ENTU_results:
     print(result)
 
 df = pd.DataFrame(ENTU_results)
-df.to_excel('GA3_HeatExchanger_Optimisation (with configuration names).xlsx', index = False)
+df.to_excel('GA3_HeatExchanger_Optimisation (with window losses shown).xlsx', index = False)
 print("Results Exported! :D")
 print(os.getcwd())
