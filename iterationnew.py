@@ -48,7 +48,7 @@ def massfunction(t_length, Hx):
 
     total_mass = mass_resin + mass_baffle + mass_nozzles + mass_shell + mass_tube + mass_rings + mass_splitter
 
-    return [total_mass - 1.1, total_mass]
+    return [total_mass - 1.2, total_mass]
 
 
 for config in iterations:
@@ -168,18 +168,22 @@ for design in hydraulic_results:
 
         ENTU_results.append({
             **design,
+            'eff': eff,
             'Q_abs': q_abs
+
         })
 
     except Exception as e:
         print(f"ENTU calculation failed for design {design}: {e}")
 
+    print("done!")
+
 ENTU_results.sort(key=lambda x: x['Q_abs'], reverse=True)
 
-for result in ENTU_results:
-    print(result)
+# for result in ENTU_results:
+#     print(result)
 
 df = pd.DataFrame(ENTU_results)
-df.to_excel('GA3_HeatExchanger_Optimisation (with window losses shown).xlsx', index = False)
+df.to_excel('GA3_HeatExchanger_Optimisation eeeee.xlsx', index = False)
 print("Results Exported! :D")
 print(os.getcwd())

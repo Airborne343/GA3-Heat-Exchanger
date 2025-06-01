@@ -31,14 +31,14 @@ def P_drop_cold(mcold, Hx, coldpoly):
     Volflow = mcold/Hx.density
     V_shell = Volflow/Hx.area_shell
 
-    if Hx.type == "triangle":
+    if Hx.type == "60":
         D_e_const1 = 1.10
         D_e_const2 = 0.917
-    elif Hx.type == "square":
+    elif Hx.type == "0" or Hx.type == "45":
         D_e_const1 = 1.27
         D_e_const2 = 0.785
     else:
-        raise Exception("invalid type given, should be triangle or square")
+        raise Exception("invalid type given, should be '60', '0', or '45'")
 
     charc_D_shell = D_e_const1 * (Hx.pitch ** 2 - D_e_const2 * Hx.tube_OD **2) / Hx.tube_OD
     Re_shell = (Hx.density * V_shell * charc_D_shell)/Hx.dynamic_viscosity
@@ -181,9 +181,12 @@ result_repository = {
         "HX_pitch": 12/1000,
         "HX_tube_count": 12,
         "HX_baffle_count": 8,
-        "HX_shape": "triangle",
+        "HX_shape": "60",
         "HX_passes": 2,
         "HX_shells": 1,
+        "HX_baffle_height": 0.785,
+        "HX_bundle_height": 0.489,
+        "rows": 3,
         "hotpoly": hot_poly_2024,
         "coldpoly": cold_poly_2024
     },
@@ -195,9 +198,12 @@ result_repository = {
         "HX_pitch": 16/1000,
         "HX_tube_count": 12,
         "HX_baffle_count": 8,
-        "HX_shape": "triangle",
+        "HX_shape": "60",
         "HX_passes": 2,
         "HX_shells": 1,
+        "HX_baffle_height": 0.750,
+        "HX_bundle_height": 0.879,
+        "rows": 5,
         "hotpoly": hot_poly_2024,
         "coldpoly": cold_poly_2024
     },
@@ -209,9 +215,12 @@ result_repository = {
         "HX_pitch": 12/1000,
         "HX_tube_count": 12,
         "HX_baffle_count": 8,
-        "HX_shape": "triangle",
+        "HX_shape": "60",
         "HX_passes": 2,
         "HX_shells": 2,
+        "HX_baffle_height": 0.754,
+        "HX_bundle_height": 0.597,
+        "rows": 6,
         "hotpoly": hot_poly_2024,
         "coldpoly": cold_poly_2024
     },
@@ -223,9 +232,12 @@ result_repository = {
         "HX_pitch": 12/1000,
         "HX_tube_count": 14,
         "HX_baffle_count": 6,
-        "HX_shape": "triangle",
+        "HX_shape": "60",
         "HX_passes": 2,
         "HX_shells": 1,
+        "HX_baffle_height": 0.750,
+        "HX_bundle_height": 0.649,
+        "rows": 5,
         "hotpoly": hot_poly_2024,
         "coldpoly": cold_poly_2024
     },
@@ -237,82 +249,85 @@ result_repository = {
         "HX_pitch": 13/1000,
         "HX_tube_count": 15,
         "HX_baffle_count": 7,
-        "HX_shape": "triangle",
+        "HX_shape": "60",
         "HX_passes": 3,
         "HX_shells": 1,
+        "HX_baffle_height": 0.702,
+        "HX_bundle_height": 0.932,
+        "rows": 8,
         "hotpoly": hot_poly_2024,
         "coldpoly": cold_poly_2024
-    },
+    }
 
-    "Group A - 2023": {
-        "year": 2023,
-        "group_name": "Group A",
-        "HX_Length": 0.334,
-        "HX_pitch": 15.2/1000,
-        "HX_tube_count": 14,
-        "HX_baffle_count": 10,
-        "HX_shape": "triangle",
-        "HX_passes": 2,
-        "HX_shells": 1,
-        "hotpoly": hot_poly_2023,
-        "coldpoly": cold_poly_2023
-    },
+    # "Group A - 2023": {
+    #     "year": 2023,
+    #     "group_name": "Group A",
+    #     "HX_Length": 0.334,
+    #     "HX_pitch": 15.2/1000,
+    #     "HX_tube_count": 14,
+    #     "HX_baffle_count": 10,
+    #     "HX_shape": "triangle",
+    #     "HX_passes": 2,
+    #     "HX_shells": 1,
+    #     "hotpoly": hot_poly_2023,
+    #     "coldpoly": cold_poly_2023
+    # },
 
-    "Group B - 2023": {
-        "year": 2023,
-        "group_name": "Group B",
-        "HX_Length": 0.271,
-        "HX_pitch": 16/1000,
-        "HX_tube_count": 12,
-        "HX_baffle_count": 8,
-        "HX_shape": "triangle",
-        "HX_passes": 2,
-        "HX_shells": 1,
-        "hotpoly": hot_poly_2024,
-        "coldpoly": cold_poly_2024
-    },
+    # "Group B - 2023": {
+    #     "year": 2023,
+    #     "group_name": "Group B",
+    #     "HX_Length": 0.271,
+    #     "HX_pitch": 16/1000,
+    #     "HX_tube_count": 12,
+    #     "HX_baffle_count": 8,
+    #     "HX_shape": "triangle",
+    #     "HX_passes": 2,
+    #     "HX_shells": 1,
+    #     "hotpoly": hot_poly_2024,
+    #     "coldpoly": cold_poly_2024
+    # },
 
-    "Group C - 2024": {
-        "year": 2024,
-        "group_name": "Group C",
-        "HX_Length": 0.360,
-        "HX_pitch": 12/1000,
-        "HX_tube_count": 12,
-        "HX_baffle_count": 8,
-        "HX_shape": "triangle",
-        "HX_passes": 2,
-        "HX_shells": 2,
-        "hotpoly": hot_poly_2024,
-        "coldpoly": cold_poly_2024
-    },
+    # "Group C - 2024": {
+    #     "year": 2024,
+    #     "group_name": "Group C",
+    #     "HX_Length": 0.360,
+    #     "HX_pitch": 12/1000,
+    #     "HX_tube_count": 12,
+    #     "HX_baffle_count": 8,
+    #     "HX_shape": "triangle",
+    #     "HX_passes": 2,
+    #     "HX_shells": 2,
+    #     "hotpoly": hot_poly_2024,
+    #     "coldpoly": cold_poly_2024
+    # },
 
-    "Group D - 2024": {
-        "year": 2024,
-        "group_name": "Group D",
-        "HX_Length": 0.320,
-        "HX_pitch": 12/1000,
-        "HX_tube_count": 14,
-        "HX_baffle_count": 6,
-        "HX_shape": "triangle",
-        "HX_passes": 2,
-        "HX_shells": 1,
-        "hotpoly": hot_poly_2024,
-        "coldpoly": cold_poly_2024
-    },
+    # "Group D - 2024": {
+    #     "year": 2024,
+    #     "group_name": "Group D",
+    #     "HX_Length": 0.320,
+    #     "HX_pitch": 12/1000,
+    #     "HX_tube_count": 14,
+    #     "HX_baffle_count": 6,
+    #     "HX_shape": "triangle",
+    #     "HX_passes": 2,
+    #     "HX_shells": 1,
+    #     "hotpoly": hot_poly_2024,
+    #     "coldpoly": cold_poly_2024
+    # },
 
-    "Group E - 2024": {
-        "year": 2024,
-        "group_name": "Group E",
-        "HX_Length": 0.320,
-        "HX_pitch": 13/1000,
-        "HX_tube_count": 15,
-        "HX_baffle_count": 7,
-        "HX_shape": "triangle",
-        "HX_passes": 3,
-        "HX_shells": 1,
-        "hotpoly": hot_poly_2024,
-        "coldpoly": cold_poly_2024
-    },
+    # "Group E - 2024": {
+    #     "year": 2024,
+    #     "group_name": "Group E",
+    #     "HX_Length": 0.320,
+    #     "HX_pitch": 13/1000,
+    #     "HX_tube_count": 15,
+    #     "HX_baffle_count": 7,
+    #     "HX_shape": "triangle",
+    #     "HX_passes": 3,
+    #     "HX_shells": 1,
+    #     "hotpoly": hot_poly_2024,
+    #     "coldpoly": cold_poly_2024
+    # },
 
 }
 
@@ -325,7 +340,10 @@ for result in result_repository.values():
             baffle_count = result['HX_baffle_count'],
             type = result['HX_shape'],
             passes = result['HX_passes'],
-            N_shell = result['HX_shells']
+            N_shell = result['HX_shells'],
+            baffle_height = result['HX_baffle_height'],
+            bundle_height = result['HX_bundle_height'],
+            rows = result['rows']
         )
 
         mhot = iteration(lambda m, Hx: P_drop_hot(m, Hx, result['hotpoly']), Hx)
@@ -352,10 +370,11 @@ for result in result_repository.values():
         })
 
         final_result.append(filtered_result)
+        print("Done!")
 
     except Exception as e:
         print(f"Calculations failed for design {result}: {e}")
 
 # print(final_result)
 df = pd.DataFrame(final_result)
-df.to_excel('past_year_heat_exchanger_results.xlsx', index=False)
+df.to_excel('past_year_heat_exchanger_results_edited.xlsx', index=False)

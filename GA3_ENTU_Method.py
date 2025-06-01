@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from HXobj import HeatExchanger
+from Datatables import find_eff
 
 def heat_transfer_coefficient(mhot, mcold, Hx):
     
@@ -47,18 +48,7 @@ def effective_NTU(HX, H, m_hot, m_cold, Thot_in = 60, Tcold_in = 20):
     A_ht = HX.tube_count * np.pi * HX.length * HX.tube_ID
     NTU = (H*A_ht)/C_min
 
-    eff_1 = 2/(1 + C_r + np.sqrt(1 + C_r**2)*((1 + np.exp(-NTU * np.sqrt(1 + C_r**2)))/(1 - np.exp(-NTU * np.sqrt(1 + C_r**2)))))
-    
-    if C_r == 1:
-        eff = (HX.N_shell * eff_1)/(1 + (HX.N_shell-1)*eff_1)
-    
-    else:
-
-        if HX.N_shell == 1:
-            eff = eff_1
-        
-        else:
-            eff = (((1-eff_1*C_r)/(1-eff_1))**HX.N_shell - 1)/(((1-eff_1*C_r)/(1-eff_1))**HX.N_shell - C_r)
+    eff = find_eff(NTU, C_r, HX.N_shell)
 
     q_max = C_min * (Thot_in - Tcold_in)
     q_abs = eff * q_max 

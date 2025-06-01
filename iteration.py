@@ -33,7 +33,7 @@ hydraulic_results = []
 ENTU_results = [] #final
 
 for config in iterations:
-    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height = config
+    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height, label = config
     pitch_m = pitch_mm/1000 #in meters
     tube_length = 3.5/N_tubes #for maximum heat transfer
     tube_length = min(3.5 / N_tubes, 0.35 - 0.11)
