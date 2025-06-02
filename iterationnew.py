@@ -6,16 +6,16 @@ from hydraulicloss import P_drop_cold, P_drop_hot, iteration
 from GA3_ENTU_Method import heat_transfer_coefficient, effective_NTU
 
 #config list: N_tubes, shape (0/45 - square, 60 - triangle), pitch, N_shell, passes
-iterations = [[10, '45', 12, 2, 2, 5, 0.66],
-[16, '0', 12, 2, 4, 4, 0.69],
-[12, '45', 12, 2, 2, 5, 0.66],
-[12, '0', 12, 2, 4, 4, 0.781],
-[10, '45', 14, 2, 2, 5, 0.75],
-[16, '60', 12, 2, 2, 5, 0.781],
-[10, '60', 14, 2, 2, 3, 0.5],
-[18, '60', 12, 2, 2, 5, 0.875],
-[16, '60', 12, 2, 4, 5, 0.875],
-[10, '60', 12, 2, 2, 4, 0.812]]
+iterations = [[10, '45', 12, 2, 2, 5, 0.66, "10-Rect-C-12"],
+[16, '0', 12, 2, 4, 4, 0.69, "16-Squ-NC-12"],
+[12, '45', 12, 2, 2, 5, 0.66, "12-Dia-NC-12"],
+[12, '0', 12, 2, 4, 4, 0.781, "12-Squ-NC-14"],
+[10, '45', 14, 2, 2, 5, 0.75, "10-Dia-NC-14"],
+[16, '60', 12, 2, 2, 5, 0.781, "16-Tri-C-12"],
+[10, '60', 14, 2, 2, 3, 0.5, "10-Tri-C-12"],
+[18, '60', 12, 2, 2, 5, 0.875, "18-Tri-NC-12"],
+[16, '60', 12, 2, 4, 5, 0.875, "16-Tri-NC-12"],
+[10, '60', 12, 2, 2, 4, 0.812, "10-Tri-NC-15"]]
 
 #constants
 mass_shell_pul = 0.650
@@ -48,18 +48,16 @@ def massfunction(t_length, Hx):
 
     total_mass = mass_resin + mass_baffle + mass_nozzles + mass_shell + mass_tube + mass_rings + mass_splitter
 
-    return [total_mass - 1.1, total_mass]
-
-
+    return [total_mass - 1.2, total_mass]
 
 
 for config in iterations:
-    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height = config
+    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height, config_name = config
     pitch_m = pitch_mm/1000 #in meter
 
     baffleheights = np.arange(0.5, 0.85, 0.025)
 
-    for baffles in range(6, 11):
+    for baffles in range(4, 15):
         for baffle_height in baffleheights:
             for N_shell in [1, 2]:
                 for passes in [2, 4]:
@@ -77,22 +75,26 @@ for config in iterations:
                         Hx_length = 0.11 + tube_length  # Adjust length with calculated tube_length
                         Hx.length = Hx_length  # Update Hx with the new length
 
+                        Arearatio = Hx.windowarea/Hx.area_shell
+
                         total_mass = massfunction(tube_length, Hx)[1]
                     
                         if total_mass <= mass_limit:
                             valid_designs.append({
+                                'config_name': config_name,
                                 'tubes': N_tubes,
                                 'shape': shape,
                                 'pitch': pitch_m,
                                 'baffles': baffles,
+                                'baffle_height': baffle_height,
+                                'bundle_height': bundle_height,
+                                'rows': rows,
                                 'passes': passes,
                                 'shells': N_shell,
                                 'tube_length': round(tube_length, 5),
                                 'Hx_length': round(Hx_length, 5),
                                 'total_mass': round(total_mass, 5),
-                                'baffle_height' : baffle_height,
-                                'bundle_height' : bundle_height,
-                                'rows': rows 
+                                'Area_ratio': Arearatio
                             })
                     
                     except Exception as e:
@@ -124,20 +126,22 @@ for design in valid_designs:
         Q_cold = mcold * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
         Q_min = min(Q_hot, Q_cold)
 
+        coldpressures = P_drop_cold(mcold, Hx)
+
         hydraulic_results.append({
             **design,
+            'P_drop_cold' : coldpressures[1],
+            'P_window' : coldpressures[3],
+            'P_crossflow' : coldpressures[2],
             'mhot': round(mhot, 4),
             'mcold': round(mcold, 4),
-            'Q_hot': round(Q_hot, 2),
-            'Q_cold': round(Q_cold, 2),
-            'Q_min': round(Q_min, 2),
+            'Q_min': round(Q_min, 2)
         })
 
     except Exception as e:
         print(f'Failed for design {design}: {e}')
-    
-hydraulic_results.sort(key=lambda x: x['Q_min'], reverse=True)
 
+hydraulic_results.sort(key=lambda x: x['Q_min'], reverse=True)
 # for result in hydraulic_results:
 #     print(result)
 
@@ -164,22 +168,22 @@ for design in hydraulic_results:
 
         ENTU_results.append({
             **design,
-            'NTU': NTU,
-            'Effectiveness': eff,
-            'Thot_out': Thot_out,
-            'Tcold_out': Tcold_out,
+            'eff': eff,
             'Q_abs': q_abs
+
         })
 
     except Exception as e:
         print(f"ENTU calculation failed for design {design}: {e}")
 
+    print("done!")
+
 ENTU_results.sort(key=lambda x: x['Q_abs'], reverse=True)
 
-for result in ENTU_results:
-    print(result)
+# for result in ENTU_results:
+#     print(result)
 
 df = pd.DataFrame(ENTU_results)
-df.to_excel('GA3_HeatExchanger_Optimisation (with length optimiser (capped length)).xlsx', index = False)
+df.to_excel('GA3_HeatExchanger_Optimisation eeeee.xlsx', index = False)
 print("Results Exported! :D")
 print(os.getcwd())

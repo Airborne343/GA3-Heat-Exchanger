@@ -30,6 +30,7 @@ class HeatExchanger:
         
         self.charc_D_shell = self.D_shell * (self.area_shell/self.area_pipe)
         self.sigma = self.area_tubes / self.area_pipe
+        self.windowarea = (self.D_shell**2/8)*(2*np.arccos(1-2*(1-self.baffle_height)) - np.sin(2*np.arccos(1-2*(1-self.baffle_height))))
 
         if self.baffle_height < 0.5 - self.bundle_height/2:
             self.crossflow_prop = 0

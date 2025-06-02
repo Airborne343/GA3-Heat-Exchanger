@@ -6,16 +6,16 @@ from hydraulicloss import P_drop_cold, P_drop_hot, iteration
 from GA3_ENTU_Method import heat_transfer_coefficient, effective_NTU
 
 #config list: N_tubes, shape (0/45 - square, 60 - triangle), pitch, N_shell, passes
-iterations = [[10, '45', 12, 2, 2, 5, 0.66],
-[16, '0', 12, 2, 4, 4, 0.69],
-[12, '45', 12, 2, 2, 5, 0.66],
-[12, '0', 12, 2, 4, 4, 0.781],
-[10, '45', 14, 2, 2, 5, 0.75],
-[16, '60', 12, 2, 2, 5, 0.781],
-[10, '60', 14, 2, 2, 3, 0.5],
-[18, '60', 12, 2, 2, 5, 0.875],
-[16, '60', 12, 2, 4, 5, 0.875],
-[10, '60', 12, 2, 2, 4, 0.812]]
+iterations = [[10, '45', 12, 2, 2, 5, 0.66, "Rect-C-12-45"],
+[16, '0', 12, 2, 4, 4, 0.69, "Squ-NC-12"],
+[12, '45', 12, 2, 2, 5, 0.66, "Dia-NC-12"],
+[12, '0', 12, 2, 4, 4, 0.781, "Squ-NC-14"],
+[10, '45', 14, 2, 2, 5, 0.75, "Dia-NC-14"],
+[16, '60', 12, 2, 2, 5, 0.781, "Tri-C-12"],
+[10, '60', 14, 2, 2, 3, 0.5, "Tri-C-12"],
+[18, '60', 12, 2, 2, 5, 0.875, "Tri-NC-12"],
+[16, '60', 12, 2, 4, 5, 0.875, "Tri-NC-12"],
+[10, '60', 12, 2, 2, 4, 0.812, "Tri-NC-15"]]
 
 #constants
 mass_shell_pul = 0.650
@@ -33,7 +33,7 @@ hydraulic_results = []
 ENTU_results = [] #final
 
 for config in iterations:
-    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height = config
+    N_tubes, shape, pitch_mm, max_shells, max_passes, rows, bundle_height, label = config
     pitch_m = pitch_mm/1000 #in meters
     tube_length = 3.5/N_tubes #for maximum heat transfer
     tube_length = min(3.5 / N_tubes, 0.35 - 0.11)
@@ -58,7 +58,8 @@ for config in iterations:
                         
                         mass_resin = rho_resin * resin_vol
                         mass_baffle = baffle_area * mass_ABS_pua
-                        mass_shell = mass_shell_pul * Hx.length
+                        print(mass_baffle)
+                        mass_shell = mass_shell_pul * Hx.length 
                         mass_tube = N_tubes * mass_tube_pul * tube_length
                         mass_rings = 2 * o_rings011 + 2 * o_rings036
                         mass_splitter = tube_length * 0.15
@@ -168,10 +169,10 @@ for design in hydraulic_results:
 
 ENTU_results.sort(key=lambda x: x['Q_abs'], reverse=True)
 
-for result in ENTU_results:
-    print(result)
+#for result in ENTU_results:
+    #print(result)
 
 df = pd.DataFrame(ENTU_results)
-df.to_excel('GA3_HeatExchanger_Optimisation (with new cooling code).xlsx', index = False)
+df.to_excel('GA3_HeatExchanger_Optimisation (with mass).xlsx', index = False)
 print("Results Exported! :D")
 print(os.getcwd())
