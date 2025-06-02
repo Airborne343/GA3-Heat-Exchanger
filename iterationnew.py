@@ -25,7 +25,6 @@ rho_resin = 1150
 o_rings011 = 0.8 / 1000
 o_rings036 = 5.3 / 1000
 mass_nozzles = 0.025 * 4
-thickness = 0.005
 mass_limit = 1.17
 
 valid_designs = []
