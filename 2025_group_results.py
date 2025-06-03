@@ -136,6 +136,9 @@ for result in result_repository.values():
         totalmass = total_mass(Hx)
         mhot = iteration(P_drop_hot, Hx)
         mcold = iteration(P_drop_cold, Hx)
+        [pdrop_hot_diff, p_hotside_total, p_drop_hotchic] = P_drop_hot(mhot, Hx)
+        [pdrop_cold_diff, p_coldside_total, p_drop_xflow, p_drop_window] = P_drop_cold(mcold, Hx)
+        
         Q_hot = mhot * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
         Q_cold = mcold * Hx.heat_cap * (Hx.temp_hot - Hx.temp_cold)
         Q_min = min(Q_hot, Q_cold)
@@ -148,6 +151,8 @@ for result in result_repository.values():
             'mass': round(totalmass, 4),
             'mhot': round(mhot, 4),
             'mcold': round(mcold, 4),
+            'Pdrop_hot': round(p_hotside_total, 4),
+            'Pdrop_cold': round(p_coldside_total, 4),
             'Q_hot': round(Q_hot, 2),
             'Q_cold': round(Q_cold, 2),
             'Q_min': round(Q_min, 2),
